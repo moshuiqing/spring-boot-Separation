@@ -1,0 +1,9 @@
+项目使用spring-boot-thymeleaf ,页面使用nginx转发  实现分离
+项目集成activemq消息管理
+聊天 TIO-layim
+邮件
+ftp上传
+oauth第三方授权
+微信公众号
+百度编辑器
+
