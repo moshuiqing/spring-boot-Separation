@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>首页</title>
+</head>
+<body>
+
+		<div>
+			<span>用户名称：</span>
+			<span id="name"></span>
+		</div>
+		<script src="/other/jquery-1.8.3.js"></script>
+		<script type="text/javascript">
+			$.post("/other/index/getUserInfo", null, function(d) {
+				console.log(d);
+				$("#name").html(d.userName);
+				
+			});
+			
+		
+		</script>
+
+</body>
+</html>
