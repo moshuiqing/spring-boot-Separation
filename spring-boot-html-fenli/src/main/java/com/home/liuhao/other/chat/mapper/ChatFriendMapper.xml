@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.liuhao.other.chat.mapper.ChatFriendMapper">
+
+	<resultMap type="com.home.liuhao.other.chat.po.ChatFriend"
+		id="ChatFriend">
+		<id property="id" column="id"  />
+		<result property="groupname" column="groupname" />
+		<collection property="list" ofType="com.home.liuhao.other.chat.po.ChatUser">
+			<result property="username" column="username" />
+			<result property="id" column="userid"/>
+			<result property="avatar" column="avatar" />
+			<result property="sign" column="sign" />
+			<result property="status" column="status" />
+		</collection>
+	</resultMap>
+
+<!-- 根据用户id查询用户好友分组 -->
+	<select id="foundChatFriend" resultMap="ChatFriend">
+		SELECT cf.groupname as groupname,cf.id as id,u.username as username,u.id as userid,u.headImg as avatar,u.sign as sign ,u.`status` as `status` from ChatFriend cf 
+		LEFT JOIN frienduser fu ON fu.friendid = cf.id LEFT JOIN sysuser u ON u.id=fu.userid
+		WHERE cf.goupUserid=#{userid} and cf.isdel=0  ORDER BY cf.id,`status`  DESC
+	</select>
+	
+	<!-- 新增分组 -->
+	<insert id="addChatFriend" parameterType="com.home.liuhao.other.chat.po.ChatFriend" keyProperty="id" useGeneratedKeys="true">
+			insert into ChatFriend(groupname,goupUserid) values(#{groupname},#{goupUserid})
+	</insert>
+	<!-- 绑定好友关系 -->
+	<insert id="BindFriend" parameterType="com.home.liuhao.other.chat.po.ChatFriend" keyProperty="id" useGeneratedKeys="true">
+			insert into FriendUser(userid,Friendid) values(#{userid},#{Friendid})
+	</insert>
+	<!-- 删除分组 -->
+	<update id="removeChatFriend" parameterType="com.home.liuhao.other.chat.po.ChatFriend">
+		update ChatFriend set isdel=1 where id=#{id}
+	</update>
+	
+	<!-- 根据id查询分组下用户id -->
+	<select id="getStrUserid" resultType="com.home.liuhao.other.chat.po.ChatFriend">	
+		SELECT userid from frienduser WHERE friendid=#{userid}
+	</select>
+	<!-- 批量新增 -->
+	<insert id="addChatFriends">
+		<foreach collection="list" item="l">
+			insert into FriendUser(userid,Friendid) values(#{l.userid},#{l.Friendid});
+		</foreach>
+	</insert>
+	<!-- 修改分组名 -->
+	<update id="upChatFriendName" parameterType="com.home.liuhao.other.chat.po.ChatFriend" >
+		update ChatFriend set groupname=#{groupname} where id=#{id}
+	</update>
+	
+	<!-- 删除分组下好友 -->
+	<delete id="delFriendUid">
+		delete from frienduser WHERE id=(select t.id from
+		(SELECT fd.id id from chatfriend cf LEFT JOIN frienduser fd on cf.id=fd.friendid
+		WHERE cf.isdel =0 and cf.goupUserid=#{uid} and fd.userid=#{frienduid}) t )
+	</delete>
+	
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.liuhao.system.mapper.SysUserMapper">
+
+	<resultMap type="com.home.liuhao.system.po.SysUser"
+		id="SysUserMap">
+		<id property="id" column="id" />
+		<result property="userName" column="username" />
+		<result property="passWord" column="password" />
+		<result property="salt" column="salt" />
+		<result property="isSingle" column="isSingle" />
+		<result property="isdel" column="isdel" />
+		<result property="isDisable" column="isdisable" />
+		<result property="userEndTime" column="userEndTime" />
+		<result property="createTime" column="createTime" />
+		<result property="rid" column="rid" />
+		<result property="pid" column="pid" />
+		<result property="status" column="status"/>
+		<result property="sign" column="sign" />
+		<association property="person"
+			javaType="com.home.liuhao.system.po.Person">
+			<id property="id" column="id2" />
+			<result property="name" column="name1" />
+			<result property="phone" column="phone" />
+			<result property="gender" column="gender" />
+			<result property="city" column="city" />
+			<result property="email" column="email" />
+			<result property="myself" column="myself" />
+			<result property="headimg" column="headimg" />
+			<result property="birthday" column="birthday"/>
+		</association>
+		<association property="role" javaType="com.home.liuhao.system.po.Role">
+		<id property="id" column="id1" />
+			<result property="name" column="name" />
+			<result property="modelid" column="modelid" />
+			<result property="remark" column="remark" />
+			<result property="menuid" column="menuid" />
+			<result property="bigmenuid" column="bigmenuid" />
+			<result property="isdel" column="isdel1" />
+			<result property="isdesable" column="isdesable1" />
+		</association>
+
+	</resultMap>
+	
+	<!-- 登录 -->
+	<select id="login" resultMap="SysUserMap" parameterType="com.home.liuhao.system.po.SysUser">
+		select u.*,r.id id1,r.bigmenuid bigmenuid,r.isdel isdel1,r.isdesable isdesable1,r.menuid menuid,r.modelid modelid,
+		r.`name` `name`,r.remark remark,u.salt salt,u.sign sign, u.`status` `status`,
+		p.birthday birthday,p.city city,p.email email,p.gender gender,p.headimg headimg,p.myself myself,p.`name` name1,p.phone phone,p.id id2 
+		from sysuser as u LEFT JOIN role as r on u.rid=r.id 
+		LEFT JOIN person as p on p.id=u.pid  WHERE u.username=#{userName} and u.isdel=0
+	</select>
+	
+	
+	
+	<update id="update" parameterType="com.home.liuhao.system.po.SysUser">
+		update sysuser 
+		<trim prefix="set" suffixOverrides=",">
+			<if test="userName!=null and userName!=''">
+				userName=#{userName},
+			</if>
+			<if test="passWord!=null and passWord!=''">
+				passWord=#{passWord},
+			</if>
+			<if test="userEndTime!=null and userEndTime!=''">
+				userEndTime=now(),
+			</if>
+			<if test="status!=null and status!=''">
+				status = #{status},
+			</if>
+			<if test="isSingle!=null and isSingle!=''">
+				isSingle=#{isSingle},
+			</if>
+			<if test="isDisable!=null and isDisable!=''">
+				isDisable=#{isDisable},
+			</if>
+			<if test="salt!=null and salt!=''">
+				salt = #{salt},
+			</if>
+			<if test="rid!=null and rid!=''">
+				rid=#{rid},
+			</if>
+			<if test="pid!=null and pid!=''">
+				pid=#{pid},
+			</if>
+			<if test="headImg!=null and headImg!=''">
+				headImg=#{headImg},
+			</if>
+			<if test="sign!=null and sign!=''">
+				sign = #{sign},
+			</if>
+		</trim>
+		<where>
+			isdel=0 and id=#{id}
+		</where>
+	</update>	
+	
+	
+	
+	<!-- 简易查询 -->
+	<select id="simpleFound" parameterType="com.home.liuhao.system.po.SysUser" resultMap="SysUserMap">
+		select u.*,r.id id1,r.bigmenuid bigmenuid,r.isdel isdel1,r.isdesable isdesable1,r.menuid menuid,r.modelid modelid,
+		r.`name` `name`,r.remark remark,u.salt salt,u.sign sign, u.`status` `status`,p.id id2,
+		p.birthday birthday,p.city city,p.email email,p.gender gender,p.headimg headimg,p.myself myself,p.`name` name1,p.phone phone 
+		from sysuser as u LEFT JOIN role as r on u.rid=r.id 
+		LEFT JOIN person as p on p.id=u.pid
+		<where>
+			u.isdel=0
+			<if test="id!=null and id!=''">and u.id=#{id}</if>
+			<if test="userName!=null and userName!=''">and u.username=#{userName}</if>
+		</where>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="pageFound" resultMap="SysUserMap">
+		select u.*,r.id id1,r.bigmenuid bigmenuid,r.isdel isdel1,r.isdesable isdesable1,r.menuid menuid,r.modelid modelid,
+		r.`name` `name`,r.remark remark,u.salt salt,u.sign sign, u.`status` `status`,
+		p.birthday birthday,p.city city,p.email email,p.gender gender,p.headimg headimg,p.myself myself,p.`name` name1,p.phone phone 
+		from sysuser as u LEFT JOIN role as r on u.rid=r.id 
+		LEFT JOIN person as p on p.id=u.pid
+		
+		<where>
+			u.isdel = 0 
+			<if test="s.id!=null and s.id!=''">and u.id=#{s.id}</if>
+			<if test="s.userName!=null and s.userName!=''">and u.username like '%${s.userName}%'</if>
+		</where>
+		order by u.createTime
+		<if test="start!=null and end!=null">
+			limit #{start} ,#{end}
+		</if>
+	</select>
+	
+	<!-- 查询数量 -->
+ 	<select id="pageCount" resultType="java.lang.Integer">
+ 		select count(1)
+		from sysuser as u LEFT JOIN role as r on u.rid=r.id 
+		LEFT JOIN person as p on p.id=u.pid
+ 		<where>
+			u.isdel = 0
+			<if test="s.id!=null and s.id!=''">and u.id=#{s.id}</if>
+			<if test="s.userName!=null and s.userName!=''">and u.username like '%${s.userName}%'</if>
+		</where>
+ 	</select>
+ 	<!-- 删除 -->
+ 	<update id="deleteUser" parameterType="com.home.liuhao.system.po.SysUser">
+ 		update sysuser set isdel =1 where id=#{id}
+ 	</update>
+ 	<!-- 批量删除 -->
+ 	<update id="deletesUsers">
+ 			update sysuser set isdel=1 where id in 
+ 			<foreach collection="uids" open="(" close=")" item="id" separator=",">
+ 				#{id}
+ 			</foreach>
+ 	</update>
+ 	
+ 	<!-- 新增 -->
+ 	<insert id="insertSysUser"  parameterType="com.home.liuhao.system.po.SysUser">
+ 		insert into sysuser(id,userName,passWord,salt,createTime,rid)
+ 		values(#{id},#{userName},#{passWord},#{salt},now(),#{rid})
+ 	</insert>
+
+
+
+</mapper>
