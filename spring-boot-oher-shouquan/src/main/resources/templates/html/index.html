@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>标题</title>
+</head>
+<body>
+
+	<div>
+		<a id="ds" href="javascript:void(0);">第三方登录</a>
+	</div>
+	<script src="/other/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+	
+		$("#ds").click(function(){
+			
+			 var a=confirm("确定要授权使用第三方登录吗？")
+			 if(a==true){
+				 window.location.href="/other/index/getCode";
+			 }
+			
+		});
+		
+	</script>
+</body>
+</html>
