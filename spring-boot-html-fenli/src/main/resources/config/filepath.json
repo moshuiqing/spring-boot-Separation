@@ -2,6 +2,7 @@
 	"webFilePath":[
 		"/web/default/{yyyy}{mm}{dd}/{time}{rand:6}",
 		"/web/userHead/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"/web/video/{yyyy}{mm}{dd}/{time}{rand:6}"
 		],
 	"mobileFilePath":[
 		"/mobile/default/{yyyy}{mm}{dd}/{time}{rand:6}"

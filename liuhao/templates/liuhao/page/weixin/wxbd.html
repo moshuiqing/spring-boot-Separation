@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div th:include="@{/ty.html}"></div>
+	<head>
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+		<meta name="misapplication-tap-highlight" content="no" />
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="MobileOptimized" content="320" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+		<title>账号绑定页面</title>
+		<link rel="stylesheet" href="http://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css" />
+		<link rel="stylesheet" th:href="@{/jqueryToast/css/toast.style.css}" />
+		<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+		<script typet="text/javascript" th:src="@{/jqueryToast/js/jquery-1.11.0.min.js}"></script>
+		<script type="text/javascript" th:src="@{/jqueryToast/js/toast.script.js}"></script>
+
+	</head>
+	<style>
+
+
+	</style>
+	<body>
+		<div>
+			<article class="weui-article">
+				<h1 style="color: red;">
+					我们的公众号未绑定您的账号和密码,请先进行绑定！还未注册的用户可直接输入账号密码注册并绑定！
+				</h1>
+			</article>
+		</div>
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">邮箱</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input class="weui-input" type="text" id="user" placeholder="请输入邮箱">
+				</div>
+			</div>
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">密码</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input class="weui-input" type="password" id="pwd" placeholder="由数字和字母组成并大于6位数">
+				</div>
+			</div>
+			<!-- 白色按钮 -->
+			<a class="weui-btn weui-btn_default" onclick="bandding()">绑定</a>
+
+		</div>
+
+		<!--BEGIN toast-->
+		<div id="toast" style="display: none;">
+			<div class="weui-mask_transparent"></div>
+			<div class="weui-toast">
+				<p class="weui-toast__content" id="info"></p>
+			</div>
+		</div>
+		<script>
+			
+			var openid = "[[${userInfo.openid}]]";
+			var nickname = "[[${userInfo.nickname}]]";
+			var mycode = "[[${mycode}]]";
+		</script>
+		<script>
+			function bandding() {
+				var user = $("#user").val();
+				var pwd = $("#pwd").val();
+				if (user == "") {
+					toast("用户名不能为空");
+					return;
+				}
+				if (pwd == "") {
+					toast("密码不能为空");
+					return;
+				}
+				var e = /^[a-z0-9._%-]+@([a-z0-9-]+\.)+[a-z]{2,4}$|^1[3|4|5|7|8]\d{9}$/;
+				var p = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,}$/;
+				if (!p.test(pwd)) {
+					toast("密码要大于6位并由字母和数字组成");
+					return;
+				}
+				if (!e.test(user)) {
+					toast("邮箱不正确");
+					return;
+				}
+				var json = {
+					userName:user,
+					password:pwd,
+					openid:openid,
+					nickname:nickname,
+					mycode:mycode
+				};
+				$.post(webname + "/wx/banding", json, function(d) {
+					toast(d.msg);
+					if(d.code>0){
+						wx.closeWindow();
+					}
+					
+				})
+				
+				
+
+
+
+			}
+
+			function toast(info) {
+
+				$.Toast("警告", info, "warning", {
+					stack: true,
+					has_icon: true,
+					has_close_btn: true,
+					fullscreen: false,
+					timeout: 1500,
+					sticky: false,
+					has_progress: true,
+					rtl: false,
+				});
+
+
+			}
+		</script>
+
+
+
+	</body>
+</html>

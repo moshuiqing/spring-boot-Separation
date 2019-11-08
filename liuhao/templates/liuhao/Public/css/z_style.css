@@ -1,0 +1,230 @@
+@charset "utf-8";
+.layui-form-pane .xz_layui-form-label{
+	width: 130px;
+}
+.layui-form-pane .xz_layui-input-block{
+	margin-left: 130px;
+}
+.xz_layui-input-block_border{
+	border: #e6e6e6 solid; 
+	border-width: 1px 1px 1px 0;
+	border-radius: 0 2px 2px 0;	
+}
+.xz_layui-input-block_border_all{
+	border: 1px #e6e6e6 solid; 
+	border-radius: 0 2px 2px 0;	
+}
+.xz_layui-input-block_border_all .layui-form-checkbox span{
+  height:18px;
+}
+.xz_rqkj{
+	width: 800px;
+	margin: 20px auto;
+}
+.xz_rqkj .fc-button-month{
+	display: none;
+}
+.xz_rqkj .fc-button-agendaWeek {
+	display: none;
+}
+.xz_rqkj .fc-button-agendaDay{
+	display: none;
+}
+.xz_rqkj .fc-button-today{
+	display: none;
+}
+.xz_rqkj .fc-header-left{
+	position: relative;
+}
+.xz_rqkj .fc-header-left .fc-button-next{
+	position: absolute;
+	right: -600px;
+	border-radius: 1px;
+	background: #009688;
+	color: #fff;
+	border: none;
+	width: 30px;
+	text-align: center;
+}
+.xz_rqkj .fc-header-left .fc-button-prev{
+	border-radius: 1px;
+	background: #009688;
+	color: #fff;
+	border: none;
+	width: 30px;
+	text-align: center;
+}
+.xz_rqkj .fc-day-header{
+	background: #eee;
+	height: 50px;
+	line-height: 50px;
+	font-size: 16px;
+}
+.xz_rqkj .fc-grid .fc-day-number{
+	font-size: 18px;
+	color: #666;
+	padding: 20px 0 0 0;
+	float: none;
+	text-align: center;
+}
+.xz_rqkj .fc-event{
+	background: #FFB800;
+	border: none;
+	text-align: center;
+	margin: 10px 0 0;
+	color: #fff;
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	border-radius: none;
+}
+.xz_rqkj .fc-ltr .fc-event-hori.fc-event-end, .xz_rqkj .fc-rtl .fc-event-hori.fc-event-start {
+	border-radius: none;
+}
+.layui-form-pane .xz_date .layui-form-label{
+	text-align: center;
+}
+.layui-form-pane .xz_date .layui-input-block{
+	padding: 30px 0 30px 106px;
+	border: #e6e6e6 1px solid;
+}
+.xz_date select{
+	float: left;
+	width: 200px;
+	margin: 0 10px;
+}
+.xz_date .layui-form-select{
+	width: 200px;
+	float: left;
+	margin: 0 10px;
+}
+.xz_span{
+	float: left;
+	height: 38px;
+	line-height: 38px;
+}
+.xz_btn_box{
+	width: 800px;
+	float: right;
+	margin: 10px 0 0;
+}
+.xz_btn_box .layui-col-xs4{
+	float: right;
+}
+.xz_btn_box .layui-col-xs2{
+	float: right;
+}
+.xz_align_center th,.xz_align_center td{
+	text-align: center;
+}
+.xz_align_center th.xz_align_left{
+	text-align: left;
+}
+.xz_align_center td{
+	position: relative;
+	height: 100px;
+	font-size: 18px;
+	color: #888;
+}
+.xz_tsbz{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	font-size: 14px;
+	color: #fff;
+	width: 60px;
+	height: 30px;
+	border-radius: 15px;
+	background: #f00;
+	text-align: center;
+	line-height: 30px;
+}
+.shezhi-pop .layui-table{
+	border-bottom: #e6e6e6 1px solid;
+	border-right: #e6e6e6 1px solid;
+	overflow: auto;
+}
+.shezhi-pop .layui-form-checkbox[lay-skin=primary] span{
+	position: absolute;
+	left: 15px;
+}
+.xz_align_center thead th .layui-table-cell{
+	height:20px;
+}
+.xz_align_center tbody td .layui-table-cell{
+	height:100px;
+	line-height:100px;
+}
+
+
+
+
+.xz_txsx{
+	float: left;
+	width: 29.3%;
+	margin: 0 2%;
+	background: #fff;
+	border-radius: 5px;
+	overflow: hidden;
+	height: 130px;
+}
+.xz_txsx_ywsp{
+	background: #6a8abd;
+}
+.xz_txsx_left{
+	float: left;
+	width: 40%;
+	height: 130px;
+}
+.xz_txsx_ywsp .xz_txsx_left{
+	background: #6383b5;
+}
+.xz_txsx_left span{
+	display: block;
+	width: 90px;
+	margin: 20px auto;
+	height: 90px;
+	font-size: 30px;
+	text-align: center;
+	line-height: 90px;
+	color: #fff;
+	border-radius: 45px;
+}
+.xz_txsx_ywsp .xz_txsx_left span{
+	background: #92a8cb;
+}
+.xz_txsx_right{
+	float: left;
+	width: 60%;
+	height: 130px;
+}
+.xz_txsx_right div{
+	font-size: 14px;
+	text-align: left;
+	color: #ececec;
+	margin: 0 0 0 20%;
+	
+}
+.xz_txsx_right div.xz_txsx_right_more{
+	font-size: 24px;
+	color: #fff;
+	margin: 35px 0 0 20%;
+}
+.xz_txsx_tdsp{
+	background: #45bfca;
+}
+.xz_txsx_tdsp .xz_txsx_left{
+	background: #3eb2bd;
+}
+.xz_txsx_tdsp .xz_txsx_left span{
+	background: #6accd5;
+}
+.xz_txsx_ppsp{
+	background: #00a0ea;
+}
+.xz_txsx_ppsp .xz_txsx_left{
+	background: #0291d3;
+}
+.xz_txsx_ppsp .xz_txsx_left span{
+	background: #1aaaec;
+}

@@ -11,6 +11,11 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.home.liuhao.other.activemq.util.DuiLeiHd;
+import com.home.liuhao.util.Global;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 消息 的 生产者
  * 
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(4)
+@Slf4j
 public class QueueProducer {
 	/*
 	 * @Autowired // 也可以注入JmsTemplate，JmsMessagingTemplate对JmsTemplate进行了封装 private
@@ -31,24 +37,35 @@ public class QueueProducer {
 
 	@Autowired
 	private JmsMessagingTemplate jmsMessagingTemplate;
-	@Autowired
-	private Queue queue;
+	int i = 0;
+	boolean flag = true;
 
 	@Scheduled(fixedDelay = 3000) // 每3s执行1次
 	public void send() {
 		try {
-			
-			   MapMessage mapMessage = new ActiveMQMapMessage();
-			   mapMessage.setString("info", "你还在睡觉");
-			   
-			   //this.jmsMessagingTemplate.convertAndSend(this.queue, mapMessage);
-			   
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+			if (flag) {
+				i++;
+				MapMessage mapMessage = new ActiveMQMapMessage();
+				mapMessage.setString("info", i + ":抢购中");
+				//this.jmsMessagingTemplate.convertAndSend("liuhao.queue", mapMessage);
+				log.info("发送请求");
+
+				Global.setDuiLeiHd(new DuiLeiHd() {
+					@Override
+					public void setStop() {
+						log.info("结束");
+						flag=false;
+					}
+				});
+			}else {
+				
 			}
-	    }
 
-
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

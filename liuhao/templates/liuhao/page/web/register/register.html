@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div th:include="@{/ty.html}"></div>
+	<head>
+		<meta charset="utf-8">
+		<title>注册账号</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all" />
+		<link rel="stylesheet" th:href="@{/css/public.css}" media="all" />
+		<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+		<script type="text/javascript" th:src="@{/myjs/jquery-1.8.3.js}"></script>
+	</head>
+	<style>
+		#zc{
+			padding-left: 10px;
+			padding-top: 20px;
+			padding-right: 40px;
+			padding-bottom: 20px;
+			-webkit-box-shadow: #666 0px 0px 10px;			
+			-moz-box-shadow: #666 0px 0px 10px;			
+			box-shadow: #666 0px 0px 10px;
+			border-radius: 10px;
+		}
+		.sc{
+			width: 100px;
+			height: 100px;
+			border-radius: 50px;
+		
+		}
+		
+		
+	</style>
+	<body>
+
+		<div>
+			<div style="width: 40%;margin: 0 auto;margin-top: 1%;border: 1px solid darkgray;" id="zc">
+				<div>
+					<div style="text-align: center;padding: 10px;font-size: 20px;color: red;">
+						填写注册信息
+					</div>
+					<div style="text-align: center;margin-bottom: 10px;">
+						<div>
+							<img th:src="@{/images/new/zcsctx.png}" class="sc" id="sctx" />
+						</div>
+						<div style="margin: 2px;color: #007DDB;">上传头像</div>
+					</div>
+					<form class="layui-form">
+						<input type="hidden" name="HeadImg" id="HeadImg" />
+						<div class="layui-form-item">
+							<label class="layui-form-label">姓名</label>
+							<div class="layui-input-block">
+								<input type="text" name="realName" lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">手机号</label>
+							<div class="layui-input-block">
+								<input type="text" name="phone" lay-verify="phone" placeholder="请输入手机号" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">出生年月</label>
+							<div class="layui-input-block">
+								<input type="text" name="birthday" placeholder="请选择出生年月" lay-verify="userBirthday" readonly class="layui-input userBirthday">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">邮箱账号</label>
+							<div class="layui-input-block">
+								<input type="text" name="userName" lay-verify="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">密码</label>
+							<div class="layui-input-block">
+								<input type="password" id="pwd" name="password" lay-verify="pwd" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">确认密码</label>
+							<div class="layui-input-block">
+								<input type="password" name="password1" lay-verify="repwd" placeholder="请再次输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">用户描述</label>
+							<div class="layui-input-block">
+								<textarea name="remark" placeholder="请输入内容" class="layui-textarea" style="resize:none"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<button class="layui-btn" lay-submit="" lay-filter="submit" >立即提交</button>
+								
+								<button type="button" id="back" class="layui-btn layui-btn-primary">取消</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var layer;
+			layui.use(['laydate', 'layer', 'table', 'form', 'upload', 'element'], function() {
+
+						// 操作对象
+						var form = layui.form,
+							laydate = layui.laydate //日期
+							,
+							table = layui.table //表格
+							,
+							upload = layui.upload //上传
+							,
+							element = layui.element; //元素操作
+						layer = layui.layer; //弹层
+
+						//自定义验证规则
+						form.verify({
+							phone: [/^1[3|4|5|7|8]\d{9}$/, '手机必须11位，只能是数字！'],
+							email: [/^[a-z0-9._%-]+@([a-z0-9-]+\.)+[a-z]{2,4}$|^1[3|4|5|7|8]\d{9}$/, '邮箱格式不对'],
+							pwd: [/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,}$/, '密码格式不对'],
+							repwd: function(value) {
+								var pwd = $('#pwd').val();
+								if (value != pwd) {
+									return '两次输入的密码不一致!';
+								}
+							},
+							userBirthday: function(value) {
+								if (!
+									/^(\d{4})[\u4e00-\u9fa5]|[-\/](\d{1}|0\d{1}|1[0-2])([\u4e00-\u9fa5]|[-\/](\d{1}|0\d{1}|[1-2][0-9]|3[0-1]))*$/
+									.test(value)) {
+									return "出生日期格式不正确！";
+								}
+							}
+
+						});
+
+						////////////////////
+						// 选择出生日期
+						laydate
+							.render({
+								elem: '.userBirthday',
+								format: 'yyyy年MM月dd日',
+								trigger: 'click',
+								max: 0,
+								done: function(value, date) {
+
+								}
+							});
+
+					
+							upload.render({
+								elem: '#sctx',
+								url: webname + '/ftpup/uploadFile',
+								method: "post", // 此处是为了演示之用，实际使用中请将此删除，默认用post方式提交
+								field: 'file',
+								accept: 'images',
+								data: {
+									INDEX: 1
+								},
+								size: '2048',
+								done: function(res, index, upload) {
+									if (res.code > 0) {
+
+										var headImg = res.object;											
+											$("#HeadImg").val(headImg);											
+											$("#sctx").attr("src",headImg);
+										}
+									}
+								})
+
+						
+							////////////////////////////////////
+							// 提交个人资料
+							form.on("submit(submit)", function(data) {
+								
+								console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+								var json = data.field;
+								if(json.HeadImg==null || json.HeadImg==''){
+									layer.msg("请上传头像！");
+									return false;
+								}
+								
+								$.post(webname + "/webbussess/weblogin/register", json, function(d) {
+									layer.msg(d.msg);
+									if(d.code>0){
+										setTimeout(function() {
+											window.location.href=webname+"/web";											
+										}, 2000);
+										
+									}
+									
+								});
+								return false;
+							})
+						////////////////////////////////////////////////////////////////////////////////////////////
+							$("#back").click(function(){
+								window.location.href=webname+"/web";
+								
+							})
+
+
+
+
+						})
+		</script>
+
+
+	</body>
+</html>

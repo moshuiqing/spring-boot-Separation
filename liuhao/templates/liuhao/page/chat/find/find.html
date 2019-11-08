@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div th:include="@{/ty.html}"></div>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<title>发现</title>
+		<link rel="stylesheet" th:href="@{/layui/css/layui.dome.css}" />
+		<link rel="stylesheet" th:href="@{/layui/css/layui.css}" />
+		<style type="text/css">
+			.layui-find-list li img {
+				position: absolute;
+				left: 15px;
+				top: 8px;
+				width: 36px;
+				height: 36px;
+				border-radius: 100%;
+			}
+
+			.layui-find-list li {
+				position: relative;
+				height: 90px;
+				;
+				padding: 5px 15px 5px 60px;
+				font-size: 0;
+				cursor: pointer;
+			}
+
+			.layui-find-list li * {
+				display: inline-block;
+				vertical-align: top;
+				font-size: 14px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.layui-find-list li span {
+				margin-top: 4px;
+				max-width: 155px;
+			}
+
+			.layui-find-list li p {
+				display: block;
+				line-height: 18px;
+				font-size: 12px;
+				color: #999;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.back {
+				cursor: pointer;
+			}
+
+			.lay_page {
+				position: fixed;
+				bottom: 0;
+				margin-left: -15px;
+				margin-bottom: 20px;
+				background: #fff;
+				width: 100%;
+			}
+
+			.layui-laypage {
+				width: 105px;
+				margin: 0 auto;
+				display: block
+			}
+
+			.show {
+				display: block;
+			}
+
+			.hiden {
+				display: none;
+			}
+
+			.tou {
+				display: -webkit-flex;
+				align-items: center;
+				justify-content: center;
+
+			}
+		</style>
+		<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+		<script type="text/javascript" th:src="@{/myjs/jquery-1.8.3.js}"></script>
+
+
+		<script th:inline="javascript">
+			/*<![CDATA[*/
+			var userid=[[${session.user.id}]];
+			/*]]>*/
+		</script>
+	</head>
+	<body>
+		<div class="layui-form">
+			<div class="layui-container" style="padding: 0">
+				<div class="layui-row layui-col-space3">
+					<div class="layui-col-xs7 mt15">
+						<input id="tj" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入用户名" class="layui-input" />
+					</div>
+					<div class="layui-col-xs1 mt15">
+						<button class="layui-btn btncolor find">查找</button>
+					</div>
+
+					<div class="layui-col-xs3 mt15">
+						<input lay-filter="radio" type="radio" name="add" value="friend" title="找人" checked="checked"></input>
+						<input lay-filter="radio" type="radio" name="add" value="group" title="找群"></input>
+						<button class="layui-btn layui-btn-xs btncolor createGroup">我要建群</button>
+					</div>
+				</div>
+				<div id="LAY_view"></div>
+				<div class="lay_page" id="LAY_page"></div>
+			</div>
+		</div>
+	</body>
+	<textarea title="消息模版" id="LAY_tpl" style="display: none;">
+			<fieldset class="layui-elem-field layui-field-title">
+			  <legend>{{ d.legend}}</legend>
+			</fieldset>	
+			<div class="layui-row ">
+				{{# if(d.type == 'friend'){ }}
+					{{#  layui.each(d.data, function(index, item){ }}
+					<div class="layui-col-xs3 layui-find-list">
+						<li layim-event="add" data-type="friend" data-index="0"
+							data-uid="{{item.id}}" data-name="{{item.username}}" data-avatar="{{item.avatar}}" data-sign="{{item.sign}}">
+							{{# if(item.avatar==null){ }}
+							<img src="{{item.avatar}}"/>
+							{{# }else{ }}
+								<img th:src="@{/images/morentx.jpg}"/>
+							{{#} }}
+							<span>{{item.username}}</span>
+							<p>{{item.sign}}  {{#  if(item.sign == ''){ }}我很懒，懒得写签名{{#  } }} </p>
+							<button class="layui-btn layui-btn-xs btncolor add"
+								data-type="friend">
+								<i class="layui-icon">&#xe654;</i>加好友</button>
+						</li>
+					</div>
+					{{#  }); }}
+				{{# }else{ }}
+					{{#  layui.each(d.data, function(index, item){ }}
+					<div class="layui-col-xs3 layui-find-list">
+						<li layim-event="add" data-type="group"
+							data-approval="{{ item.content }}" data-index="0"
+							data-uid="{{ item.id }}" data-name="{{item.groupname}}" data-avatar="{{item.avatar}}">
+							<img src="{{item.avatar}}"/>
+							<span>{{item.groupname}}</span>
+							<p>{{item.content}}  {{#  if(item.content == ''){ }}无{{#  } }} </p>
+							<button class="layui-btn layui-btn-xs btncolor add"
+								data-type="group">
+								<i class="layui-icon">&#xe654;</i>加群</button>
+						</li>
+					</div>
+					{{#  }); }}
+				{{# } }}
+			</div>	
+        </textarea>
+	<script>
+		var tcaddqun;
+		var from;
+		var flag = true;
+		layui.config({
+			base: webname + '/chat/js/'
+		}).extend({
+			socket: 'socket'
+		});
+		layui.use(
+			['layim', 'laypage', 'form', 'socket', 'upload' ],
+			function(socket) {
+				var layim = layui.layim,
+					layer = layui.layer,
+					laytpl = layui.laytpl,
+					form = layui.form,
+					$ = layui.jquery,
+					upload = layui.upload,
+					laypage = layui.laypage;
+				var cache = parent.layui.layim.cache();
+
+				$(function() {
+					$(".createGroup").addClass("hiden");
+					getRecommend();
+					form.on('radio(radio)', function(data) {
+						$("#tj").val("");
+						var type = data.value; //被点击的radio的value值
+						if (type == "friend") {
+							flag = true;
+							$(".createGroup").addClass("hiden");
+							getRecommend();
+							$("#tj").attr("placeholder", "请输入用户名")
+						} else if (type == "group") {
+							flag = false;
+							$(".createGroup").removeClass("hiden");
+							getGroup();
+							$("#tj").attr("placeholder", "请输入群名称")
+						}
+
+					});
+
+					$(".createGroup").click(function() {
+						addQun();
+					})
+
+				});
+
+				function getRecommend() {
+					$.post(webname + "/chatUser/getRecom", {
+						userid: userid
+					}, function(res) {
+						var data = eval('(' + res + ')');
+						var html = laytpl(LAY_tpl.value).render({
+							data: data,
+							legend: '推荐好友',
+							type: 'friend'
+						});
+						$('#LAY_view').html(html);
+					});
+				}
+
+				function getGroup() {
+					$.post(webname + "/chatUser/getGroup", {
+						userid: userid
+					}, function(res) {
+						var data = eval('(' + res + ')');
+						var html = laytpl(LAY_tpl.value).render({
+							data: data,
+							legend: '推荐群',
+							type: 'group'
+						});
+						$('#LAY_view').html(html);
+					});
+				}
+
+
+				$('body').on('click', '.add', function() { //添加好友
+					var othis = $(this),
+						type = othis.data('type');
+					parent.layui.socket.addFriendGroup(othis, type, userid);
+
+				});
+
+
+
+
+
+
+				$("body").keydown(function(event) {
+					if (event.keyCode == 13) {
+						$(".find").click();
+					}
+				});
+				$('body').on('click', '.back', function() { //返回推荐好友
+					getRecommend();
+					$("#LAY_page").css("display", "none");
+				});
+
+				$('body').on('click', '.find', function() {
+					$("#LAY_page").css("display", "block");
+					var othis = $(this),
+						input = othis.parents('.layui-col-space3').find('input').val();
+					var addType = $('input:radio:checked').val();
+					if (input) {
+						var url = webname + "/chatUser/getUserCount";
+						$.post(url, {
+							type: addType,
+							value: input,
+							uid: userid
+						}, function(data) {
+							var res = eval('(' + data + ')');
+							if (res.code != 0) {
+								return layer.msg(res.msg);
+							}
+							laypage.render({
+								elem: 'LAY_page',
+								count: res.object.count,
+								limit: res.object.limit,
+								prev: '<i class="layui-icon">&#58970;</i>',
+								next: '<i class="layui-icon">&#xe65b;</i>',
+								layout: ['prev', 'next'],
+								curr: res.object.limit,
+								jump: function(obj, first) {
+									//obj包含了当前分页的所  var url = "";    
+									//首次不执行
+									if (first) {
+										var page = res.object.limit;
+									} else {
+										var page = obj.curr;
+									}
+									$.post(webname + "/chatUser/getPageChatUser", {
+										uid: userid,
+										type: addType,
+										value: input,
+										page: obj.curr || 1
+									}, function(res) {
+										var data = eval('(' + res + ')');
+										var html = laytpl(LAY_tpl.value).render({
+											data: data,
+											legend: '<a class="back"><i class="layui-icon">&#xe65c;</i>返回</a> 查找结果',
+											type: addType
+										});
+										$('#LAY_view').html(html);
+									});
+								}
+							});
+						});
+					}
+				});
+
+				//////////////
+				function addQun() {
+					tcaddqun = layer.open({
+						type: 1,
+						title: '新建群组',
+						area: ['450px', '400px'],
+						shade: 0.1,
+						anim: 2,
+						id: 'layui-qun',
+						content:$("#qun")
+					});
+
+				}
+				
+				form.on('submit(addqun)', function(data){
+					var param = data.field;					
+					var img = $("#qtx").attr("src");
+					param.avatar = img;
+					console.log(param);
+
+				  	$.post(webname + "/chatUser/insertGroup", param, function(d) {
+						qjty(d);
+						if(d.code>0){
+							layer.msg("新建成功！");
+							window.parent.addGroup(d);
+						
+							layer.close(tcaddqun);
+							}
+					});
+				  
+				  
+				  
+				  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});
+				
+				// 上传头像
+				upload.render({
+					elem: '#qtx',
+					url: webname + '/ftpup/uploadFile',
+					method: "post", // 此处是为了演示之用，实际使用中请将此删除，默认用post方式提交
+					field: 'file',
+					accept: 'images',
+					data: {
+						INDEX: 0
+					},
+					size: '2048',
+					done: function(res, index, upload) {
+						if (res.code > 0) {						
+							var headImg = res.object;
+							$("#qtx").attr("src",headImg);
+						}else{
+							layer.msg("上传失败！")
+						}
+						
+					}						
+					});
+
+					
+					
+			
+
+
+
+			});
+	</script>
+	<div id="qun" style="display: none;">
+
+		<div style="width: 95%;margin-top: 5%;">
+			<form class="layui-form">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">群头像</label>
+					<div class="layui-input-block">
+						<img id="qtx" th:src="@{/images/tpsc.png}" width="20%" />
+					</div>
+				</div>
+				<!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+				<div class="layui-form-item">
+					<label class="layui-form-label">群名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="groupname" placeholder="请输入群名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">群介绍</label>
+					<div class="layui-input-block">
+						<textarea name="content" placeholder="请输入内容" class="layui-textarea"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit lay-filter="addqun" style="margin-left: 20%;">立即提交</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</div>
+
+</html>

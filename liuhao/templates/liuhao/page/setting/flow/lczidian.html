@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="https://www.pollix.at/thymeleaf/shiro">
+	<div th:include="@{/ty.html}"></div>
+	<head>
+		<meta charset="utf-8" />
+		<title>流程字典</title>
+		<meta name="renderer" content="webkit" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="format-detection" content="telephone=no" />
+
+		
+		<link rel="stylesheet" th:href="@{/layui/css/layui.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{/Public/css/common.css}" />
+		<link rel="stylesheet" th:href="@{/Public/css/sub_page.css}">
+		<script type="text/javascript" th:src="@{/myjs/jquery-1.8.3.js}"></script>
+		<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+		<script type="text/javascript" th:src="@{/page/setting/flow/lczidian.js}"></script>
+		<script type="text/javascript">
+			var flowId = "[[${flowId}]]";
+		</script>
+
+	</head>
+	
+	
+	
+	
+<body class="childrenBody">
+	
+	
+	
+	<form class="layui-form">
+		<blockquote class="layui-elem-quote quoteBox">
+			<form class="layui-form">
+				<div shiro:hasPermission="新增" class="layui-inline">
+					<a  lay-submit lay-filter="add" class="layui-btn layui-btn-normal add-tjzx-btn">添加流程节点</a>
+				</div>
+				
+				
+				<div class="layui-inline" style="float: right;">
+					<a onclick="self.location=document.referrer;" class="layui-btn layui-btn-normal add-tjzx-btn">
+							<i class="layui-icon">&#xe65a;</i>返回上一页
+					</a>
+				</div>
+			</form>
+		</blockquote>
+			<table id="dg"  ></table>
+		<!--弹窗 -->
+		<div id="editDialog" class="czmm-pop pop-width-600 pop-window">
+			<blockquote class="pop-header layui-elem-quote">
+				<h3>编辑</h3>
+			</blockquote>
+			<div class="pop-body">
+				<form class="layui-form layui-form-pane" lay-filter="node" action="">
+					<input type="hidden" name="id" id="id" />
+					<input type="hidden" name="flowId" id="flowId">
+					<div class="layui-form-item">
+						<label class="layui-form-label">节点名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="processname" lay-verify="required" id="processname" autocomplete="off" placeholder="请输入节点名称"
+							 class="layui-input">
+
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">选择方式</label>
+						<div class="layui-input-block">
+							<select name="pd" lay-filter="chage" id="pd" class="layui-input">
+								<option value="1">自定义编码</option>
+								<option value="2">默认编码</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">节点编码</label>
+						<div class="layui-input-block">
+							<input type="text" name="nodeCode" id="nodeCode" lay-verify="required" autocomplete="off" placeholder="请输入节点名称"
+							 class="layui-input">
+
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">节点类型</label>
+						<div class="layui-input-block">
+							<input type="radio" name="processtype" value="0" title="状态节点" checked>
+							<input type="radio" name="processtype" value="1" title="前操作节点">
+							<input type="radio" name="processtype" value="2" title="后操作节点">
+
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">备注</label>
+						<div class="layui-input-block">
+							<textarea id="mark" name="mark" placeholder="请输入备注" class="layui-textarea"></textarea>
+						</div>
+					</div>
+
+
+
+					<div class="layui-form-item layui-col-space15">
+						<div class="layui-col-xs4">
+							<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="submit">确定</button>
+						</div>
+						<div class="layui-col-xs2">
+							<a class="layui-btn layui-btn-primary layui-btn-fluid layui-layer-close ">取消</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+
+	</body>
+</html>

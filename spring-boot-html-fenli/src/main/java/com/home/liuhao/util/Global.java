@@ -5,11 +5,13 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.home.liuhao.other.activemq.util.DuiLeiHd;
 import com.home.liuhao.util.systemutil.CloseImpl;
 
 @Component
 public class Global {
 	
+
 
 	
 	public static final String CHARSET = "utf-8";
@@ -18,6 +20,8 @@ public class Global {
 	 * 上传路劲缓存key
 	 */
 	public final static String FILEPATHKEY="FTPFILEPATH";
+	
+	public final static String FILEPATH="filePath";
 	/**
 	 * 系统菜单
 	 */
@@ -96,6 +100,17 @@ public class Global {
 	
 	public static String ftpScource;
 	
+	
+	/**
+	 * ftp绝对路径
+	 */
+	public static String ftpPath;
+	
+	@Value("${ftpPath}")
+	public void setFtpPath(String ftpPath) {
+		Global.ftpPath = ftpPath;
+	}
+
 	@Value("${ftpScource}")
 	public  void setFtpScource(String ftpScource) {
 		Global.ftpScource = ftpScource;
@@ -168,6 +183,14 @@ public class Global {
 	public static  void  setClose(CloseImpl close) {
 		Global.close = close;
 	}
+	
+	public static DuiLeiHd duiLeiHd;
+
+	public static void setDuiLeiHd(DuiLeiHd duiLeiHd) {
+		Global.duiLeiHd = duiLeiHd;
+	}
+	
+	
 	
 
 

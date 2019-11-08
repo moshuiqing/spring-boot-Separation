@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div th:include="@{/ty.html}"></div>
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="renderer" content="webkit" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+		<title>首页</title>
+		<link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+		<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+		<script type="text/javascript" th:src="@{/myjs/jquery-1.8.3.js}"></script>
+		<script type="text/javascript" th:src="@{/chat/tio/tiows.js}"></script>
+	</head>
+	<body>
+		<div>web首页</div>
+
+
+
+
+
+
+		<script type="text/javascript">
+			//演示代码
+			layui.use('layim', function(layim) {
+				var layim = layui.layim;
+				layim.config({
+					init: {
+						//配置客户信息
+						mine: {
+							"username": "访客" //我的昵称
+								,
+							"id": "100000123" //我的ID
+								,
+							"status": "online" //在线状态 online：在线、hide：隐身
+								,
+							"remark": "在深邃的编码世界，做一枚轻盈的纸飞机" //我的签名
+								,
+							"avatar": "//res.layui.com/images/fly/avatar/00.jpg" //我的头像
+						}
+					}
+					//开启客服模式
+					,
+					brief: true
+				});
+				//打开一个客服面板
+				layim.chat({
+					name: '在线客服一' //名称
+						,
+					type: 'kefu' //聊天类型
+						,
+					avatar: '//tp1.sinaimg.cn/5619439268/180/40030060651/1' //头像
+						,
+					id: 1111111 //定义唯一的id方便你处理信息
+				}).chat({
+					name: '在线客服二' //名称
+						,
+					type: 'kefu' //聊天类型
+						,
+					avatar: '//tp1.sinaimg.cn/5619439268/180/40030060651/1' //头像
+						,
+					id: 2222222 //定义唯一的id方便你处理信息
+				});
+				layim.setChatMin(); //收缩聊天面板
+
+				//////////////////////////////////
+				//监听发送消息
+				layim.on('sendMessage', function(data) {
+					var To = data.to;
+					var send = {
+						username: data.mine.username,
+						avatar: data.mine.avatar,
+						id: data.mine.id,
+						type: data.to.type,
+						content: data.mine.content,
+						mine: false,
+						fromid: data.mine.id,
+						toid: data.to.id
+					}
+
+					var info = {
+						type: "chat",
+						send: send
+					};
+
+
+					//保存消息
+					var param = {
+						sendId: data.mine.id,
+						toId: data.to.id,
+						content: data.mine.content,
+						type: data.to.type,
+					};
+					$.post(webname + "/chatUser/insertRecord", param, function(d) {
+						if (d.code < 0) {
+							layer.msg("系统错误")
+						} else {
+							info.jilu = d.object.id;
+							tiows.send(JSON.stringify(info));
+						}
+					})
+
+
+				});
+				///////////////////////////////////////////////////
+				
+
+			});
+		</script>
+
+
+	</body>
+
+
+	<script type="text/javascript">
+		///////////////////////////////////
+		var IMHandler = function() {
+
+			this.onopen = function(event, ws) {
+				ws.send('hello 连上了哦')
+				//document.getElementById('contentId').innerHTML += 'hello 连上了哦<br>';
+			}
+
+			/**
+			 * 收到服务器发来的消息
+			 * @param {*} event 
+			 * @param {*} ws 
+			 */
+			this.onmessage = function(event, ws) {
+				var data = event.data;
+				var res;
+				if (data != null && data != "" && data != 'hello 连上了哦' && data != "心跳内容") {
+					res = JSON.parse(data);
+					if (res.type == 'chat') {
+						//表示聊天类型
+						if (res.send.fromid != userid) {
+							layim.getMessage(res.send); //res.data即你发送消息传递的数据（阅读：监听发送的消息）
+						}
+					}
+				}
+
+
+
+				//////////////////////////////////////
+			}
+
+			this.onclose = function(e, ws) {
+				// error(e, ws)
+			}
+
+			this.onerror = function(e, ws) {
+				// error(e, ws)
+			}
+
+			/**
+			 * 发送心跳，本框架会自动定时调用该方法，请在该方法中发送心跳
+			 * @param {*} ws 
+			 */
+			this.ping = function(ws) {
+				// log("发心跳了")
+				ws.send('心跳内容')
+
+				//layim.setFriendStatus(11111, 'online');
+
+			}
+		}
+
+
+		/////////////////////////////////////
+		var ws_protocol = 'ws'; // ws 或 wss
+		var ip = tcpIp;
+		var port = tcpPort;
+
+		var heartbeatTimeout = 6000; // 心跳超时时间，单位：毫秒
+		var reconnInterval = 1000; // 重连间隔时间，单位：毫秒
+
+		var binaryType = 'blob'; // 'blob' or 'arraybuffer';//arraybuffer是字节
+		var handler = new IMHandler()
+		var myself = 0;
+
+
+		var tiows;
+
+		function initWs() {
+
+			var queryString = 'id=' + userid + "&groups=" + groups;
+
+			var param = "";
+			tiows = new tio.ws(ws_protocol, ip, port, queryString, param, handler, heartbeatTimeout, reconnInterval, binaryType)
+			tiows.connect();
+		}
+
+		initWs();
+	</script>
+</html>

@@ -243,7 +243,7 @@
 		</dependency>
 
 
-		<!-- 微信开发所用 开始-->
+		<!-- 微信开发所用 开始 -->
 		<!-- xml -->
 		<dependency>
 			<groupId>org.dom4j</groupId>
@@ -257,7 +257,43 @@
 			<version>1.4.11.1</version>
 		</dependency>
 
-		<!-- 微信开发所用 结束-->
+		<!-- 微信开发所用 结束 -->
+
+		<!-- 视频截图用-->
+		 <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+ 
+        <dependency>
+            <groupId>org.bytedeco.javacpp-presets</groupId>
+            <artifactId>ffmpeg-platform</artifactId>
+            <version>4.0.2-1.4.3</version>
+        </dependency>
+        
+        <!-- 表格操作 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>3.11</version>
+		</dependency>
+
 
 
 

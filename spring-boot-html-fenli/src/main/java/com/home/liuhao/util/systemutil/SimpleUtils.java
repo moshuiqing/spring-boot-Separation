@@ -21,6 +21,43 @@ import com.home.liuhao.util.JsonMap;
  * @author by liuhao
  */
 public class SimpleUtils {
+	
+	
+	/**  
+     * 概要说明 : 返回信息 <br>
+     * 详细说明 : 返回信息 <br>
+     *
+     * @param result 判断值
+     * @return  String 类型返回值说明
+     * @see  com.jinge.portal.utils.SimpleUitl#backMsg()
+     * @author  by liuhao @ 2018年7月17日, 下午2:04:43 
+     */
+    public static String backMsg(Integer result)
+    {
+
+        String msg = "";
+        if (result > 0)
+        {
+            msg = "操作成功！";
+        }
+        else if (result == -2)
+        {
+            msg = "名称重复，请更换！";
+        }
+        else if (result == -3)
+        {
+            msg = "缺少参数";
+        }
+        else
+        {
+            msg = "操作失败！";
+        }
+
+        return msg;
+    }
+
+	
+	
 	/**
 	 * 概要说明 : 判断是否为空 <br>
 	 * 详细说明 : 判断是否为空 <br>
@@ -80,7 +117,7 @@ public class SimpleUtils {
 
 	/**
 	 * 概要说明 : 返回指定区间的随机数 <br>
-	 * 详细说明 : TODO ADD Instruction. <br>
+	 * 详细说明 : 返回指定区间的随机数 <br>
 	 *
 	 * @param max
 	 * @param min

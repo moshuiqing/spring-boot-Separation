@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.home.liuhao.other.activemq.comment.ApolloClient;
 import com.home.liuhao.other.activemq.po.Msg;
+import com.home.liuhao.other.weixin.entity.WeiXinMoBan;
 import com.home.liuhao.other.weixin.entity.WeiXinUserInfo;
 import com.home.liuhao.other.weixin.util.WeiXinUtil;
 import com.home.liuhao.other.weixin.util.WxGlobal;
@@ -260,6 +261,48 @@ public class WxController {
 			} 
 		}
 		return jm;
+	}
+	
+	/**
+	 * 发送模板
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value="sendWxMb",method=RequestMethod.POST)
+	@ResponseBody
+	@ApiOperation("发送模板信息")
+	public JsonMap sendWxMb(User user) {
+		JsonMap jm = new JsonMap();
+		user.setRealName("刘浩");
+		user.setOpenid("oJKSHwQ0c6mfKioiKcuBGNgYuA2E");
+		String info="";
+		if (user.getOpenid() != null) {
+			
+			try {
+				String money = "10000";
+				String data = "{\"keyword1\":{\"value\":\"" + user.getRealName()
+						+ "\",\"color\":\"#173177\"},\"keyword2\":{\"value\":\""
+						+ money + "\",\"color\":\"#173177\"}}";
+				WeiXinMoBan moBan = new WeiXinMoBan();
+				moBan.setTouser(user.getOpenid());
+				moBan.setTemplate_id("2Dj5XJ_XtpUDq5NLkfMh-oonHvQ98MAIEZg8kecDmJ4");
+				moBan.setUrl("https://www.baidu.com/");
+				moBan.setData(data);
+				info = WeiXinUtil.tuiSong(moBan);
+				jm.setCode(1);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			info = "账号没有绑定微信公众号！";
+			jm.setCode(-1);
+			
+		}
+		jm.setMsg(info);
+		
+		return jm;
+		
+		
 	}
 
 }

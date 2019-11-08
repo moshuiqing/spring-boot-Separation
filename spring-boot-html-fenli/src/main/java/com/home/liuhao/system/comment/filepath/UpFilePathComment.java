@@ -40,7 +40,7 @@ public class UpFilePathComment implements CommandLineRunner {
 		}
 		brReader.close();
 		FilePath filePath = JSON.parseObject(builder.toString(), FilePath.class);
-		Cache<String, Object> sysCache = cacheManager.getCache("filePath");
+		Cache<String, Object> sysCache = cacheManager.getCache(Global.FILEPATH);
 		sysCache.put(Global.FILEPATHKEY, filePath);
 		log.info("上传文件路劲存入缓存");
 		

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baidu.ueditor.PathFormat;
 import com.home.liuhao.other.ftp.po.FilePath;
 import com.home.liuhao.other.ftp.util.Ftp;
-import com.home.liuhao.system.po.SysUser;
 import com.home.liuhao.util.Global;
 import com.home.liuhao.util.JsonMap;
 
@@ -57,13 +55,14 @@ public class FtpUploadController {
 			reMap.setCode(-1);
 			return reMap;
 		}
-		Cache<String, Object> sysCache = ehCacheManager.getCache("menuEacache");
+		Cache<String, Object> sysCache = ehCacheManager.getCache(Global.FILEPATH);
 		String path;
 		try {
 			Integer index = Integer.parseInt(request.getParameter(Global.INDEXPATH));
 			FilePath filePath = (FilePath) sysCache.get(Global.FILEPATHKEY);
 			path = Global.ftpScource+ filePath.getWebFilePath()[index];
 		} catch (Exception e) {
+			e.printStackTrace();
 			String filename = UUID.randomUUID().toString();
 			path = Global.ftpScource+"/web/default/" + filename;
 		}

@@ -60,7 +60,7 @@ public class WxTask {
 			log.info("重新获取微信的access_token和ticket");
 			WeiXinUtil.setWeixinInfo();
 		}else{
-			//System.out.println("不需要从新获取,间隔为："+value);
+			//System.out.println("不需要从新获取,间隔为："+global.getAccess_token());
 		}
 		/*System.out.println(datetime);
 		System.out.println(now);*/

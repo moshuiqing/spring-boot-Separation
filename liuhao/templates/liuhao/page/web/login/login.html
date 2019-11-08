@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div th:include="@{/ty.html}"></div>
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="renderer" content="webkit" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+		<title>web登录</title>
+		<link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/css/style.css}">
+		<link rel="stylesheet" th:href="@{/css/index.css}" media="all" />
+		<link rel="stylesheet" th:href="@{/css/public.css}" media="all" />
+	</head>
+	<style>
+		.demo-class .layui-layer-title{background:#c00; color:#fff; border: none;}
+		.hiden{
+			display: none;
+		}
+		
+	</style>
+	<script type="text/javascript">
+		var warn = "[[${warn}]]";
+	</script>
+	<body>
+
+		<div class="login-main">
+			<header class="layui-elip">用户登录</header>
+			<form class="layui-form" lay-filter="form">
+				<div class="layui-input-inline">
+					<input type="text" name="userName" lay-verify="required|email" placeholder="账号" autocomplete="off" class="layui-input" />
+				</div>
+				<div class="layui-input-inline">
+					<input type="password" name="password" lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input" />
+				</div>
+				<div class="layui-input-inline ">
+					<div style="width: 200px; display: inline-block;">
+						<input class="layui-input" name="captchaCode" placeholder="验证码" lay-verify="required" type="text" autocomplete="off" />
+					</div>
+					<div style="display:inline-block;margin-left: 20px;">
+						<img type="image" th:attr="src=@{/captcha/kaptcha.jpg}" id="codeImage" onclick="chageCode()" title="图片看不清？点击重新得到验证码"
+						 style="cursor:pointer;" width="116" height="36" />
+					</div>
+				</div>
+				<div class="layui-input-inline">
+					<input type="checkbox" name="rememberMe" title="记住我" lay-skin="primary" />
+				</div>
+				<div class="layui-input-inline login-btn">
+					<button lay-submit="" lay-filter="submit" class="layui-btn">登录</button>
+				</div>
+				<hr />
+				<div class="layui-input-inline">
+					<button type="button" id="wxsm" class="layui-btn layui-btn-normal">微信扫码登录</button>
+				</div>
+				<p><a href="javascript:;" class="fl" id="register">立即注册</a><a href="javascript:;" id="xiugai" class="fr">忘记密码？</a></p>
+			</form>
+		</div>
+
+
+		<div style="width: 10%;position: absolute;right: 0px;bottom: 5%;" id="ewm" class="hiden">
+			<img src="" id="wxgzh" style="width: 80%;" />
+			<div style="width: 80%;text-align: center;">
+				关注微信公众号
+			</div>
+		</div>
+
+		<div id="emailModel" style="display: none;">
+			<div>
+				<input type='text' style='width: 200px;height:30px;margin-top:20px;margin-left:20px;font-size: 16px;' id='em'
+				 placeholder='请输入邮箱' />
+				<button id="sendemail" type="button" class="layui-btn layui-btn-sm layui-btn-normal" style="margin-left: 5%;margin-top: -1%;">发送邮件</button>
+			</div>
+		</div>
+
+
+		<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+		<script type="text/javascript" th:src="@{/myjs/jquery-1.8.3.js}"></script>
+		<script type="text/javascript" th:src="@{/myjs/jquery.qrcode.min.js}"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var layer;
+			var index;
+			var sjm; //随机码 
+			var one; //忘记密码弹窗
+			layui.use(['laydate', 'layer', 'table', 'form', 'upload', 'element'], function() {
+
+				// 操作对象
+				var form = layui.form,
+					laydate = layui.laydate //日期
+					,
+					table = layui.table //表格
+					,
+					upload = layui.upload //上传
+					,
+					element = layui.element; //元素操作
+				layer = layui.layer; //弹层
+
+				
+
+				$.post(webname + "/wx/getPermanent", null, function(d) {
+					console.log(d.object);
+					if(d.object!=''){
+						$("#wxgzh").attr("src",d.object);
+						$("#ewm").removeClass("hiden");
+					}
+				});
+
+
+
+				//自定义验证规则
+				form.verify({
+					phone: [/^1[3|4|5|7|8]\d{9}$/, '手机必须11位，只能是数字！'],
+					email: [/^[a-z0-9._%-]+@([a-z0-9-]+\.)+[a-z]{2,4}$|^1[3|4|5|7|8]\d{9}$/, '邮箱格式不对']
+				});
+
+				//登录监听
+				form.on('submit(submit)', function(data) {
+					console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+					var json = data.field;
+					$.post(webname + "/webbussess/weblogin/webLogin", json, function(d) {
+						if (d.code == 1) {
+							layer.msg(d.msg, {
+								time: 2000
+							});
+							setTimeout(() => {
+								window.location.href = webname + "/webbussess/weblogin/toWebIndex";
+							}, 1000);
+
+						} else if (d.exception != null) {
+							layer.msg(d.exception, {
+								time: 2000
+							});
+						} else {
+							if (d.msg != null) {
+								layer.msg(d.msg, {
+									time: 2000
+								});
+							}
+
+						}
+					})
+					return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});
+
+				//判断是否在别处登录
+				/*<![CDATA[*/
+				if (warn != null && warn != '') {
+					layer.msg(warn, {
+						icon: 0,
+						time: 4000
+					});
+				}
+
+				/*]]>*/
+
+				//////////////////////////////////////////////////////////////////////////////////////////////////////
+				function open() {
+					index = layer.open({
+						type: 1,
+						title: '二维码三分钟后过期！请尽快扫码登录！',
+						area: ['360px', '300px'],
+						shadeClose: true, //点击遮罩关闭
+						skin: 'demo-class',
+						content: "<div style=\"margin-left:78px;margin-top:20px;\" id=\"qrcode\"></div>",
+						cancel: function(index, layero) {
+							layer.close(index);
+
+							return false;
+						}
+					});
+				}
+
+				$("#wxsm").click(function() {
+					//获取随机码
+					$.post(webname + "/wx/getSjm", function(d) {
+						var map = d.object;
+						if (map != null && map.url != null) {
+							sjm = map.code;
+							open();
+							// 更详细的配置
+							$("#qrcode").qrcode({
+								text: map.url, // 要编码的字符串
+								width: 200, // 定义宽度
+								height: 200, // 定义高度
+								background: "#fff", // 背景色
+								foreground: "black" // 前景色
+							});
+							setTimeout("clear()", 180000); //设置三分钟执行
+						} else {
+							layer.msg("系统异常")
+						}
+					});
+				});
+				////////////////////////////
+
+
+
+
+
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			});
+
+			function chageCode() {
+				//document.getElementById("codeImage").src=webname+"/captcha/kaptcha.jpg?"+Math.random();
+				$("#codeImage").attr("src", webname + "/captcha/kaptcha.jpg?" + Math.random());
+			}
+
+
+
+			$(function() {
+				setInterval(() => {
+					$("#codeImage").attr("src", webname + "/captcha/kaptcha.jpg?" + Math.random());
+				}, 60000);
+			})
+			//清除
+			function clear() {
+				layer.close(index);
+				$.post(webname + "/wx/clearCode", {
+					code: sjm
+				});
+
+			}
+
+			//////////////////////////////////////////////////////////////
+			//忘记密码
+			$("#xiugai").click(function() {
+				one = layer.open({
+					type: 1,
+					title: '请输入邮箱',
+					area: ['360px', '120px'],
+					shadeClose: true, //点击遮罩关闭
+					skin: 'demo-class',
+					content: $("#emailModel"),
+					skin: 'show',
+					cancel: function(index, layero) {
+
+						layer.close(one);
+
+						return false;
+					}
+				});
+			})
+			////////////////////////////////////
+			$("#sendemail").click(function() {
+				var email = $("#em").val();
+				var reg = /^[a-z0-9._%-]+@([a-z0-9-]+\.)+[a-z]{2,4}$|^1[3|4|5|7|8]\d{9}$/;
+				if (email == null || email == '') {
+					layer.msg("邮箱不能为空！");
+					return;
+				}
+				if (!reg.test(email)) {
+					layer.msg("邮箱格式不正确！");
+					return;
+				}
+				layer.close(one);
+				layer.msg("邮件发送中请稍后。。。。");
+				$.post(webname + "/webbussess/weblogin/retrievePwd", {
+					email: email
+				}, function(d) {
+
+					layer.msg(d.msg);
+
+				});
+			})
+			////////////////////////////////////////////////////////////////////////
+			$("#register").click(function() {
+				window.location.href = webname + "/webbussess/weblogin/toRegister";
+			})
+		</script>
+
+		<script type="text/javascript">
+			var client = new Paho.MQTT.Client("127.0.0.1", 61614, "/", "clientId"); // set callback handlers
+			client.onConnectionLost = onConnectionLost;
+			client.onMessageArrived = onMessageArrived; // connect the client
+			client.connect({
+				userName: 'admin',
+				password: 'admin',
+				onSuccess: onConnect
+			}); // called when the client connects
+			function onConnect() { // 连接成功后的处理 // Once a connection has been made, make a subscription and send a message.
+				console.log("onConnect");
+				client.subscribe("liuhao"); // 订阅消息的主题 
+				/* var message = new Paho.MQTT.Message("Hello，thisis a test ");
+				message.destinationName = " / topic / event ";
+				client.send(message); // 发送消息 */
+			} // called when the client losesits connection
+			function onConnectionLost(responseObject) { // 连接丢失后的处理
+				if (responseObject.errorCode !== 0) {
+					console.log("onConnectionLost:" + responseObject.errorMessage);
+				}
+			} // called when a message arrives function
+			function onMessageArrived(message) {
+				console.log("onMessageArrived:" + message.payloadString);
+				var msg = message.payloadString;
+				if (msg != null && msg != '') {
+					var data = JSON.parse(msg);
+					var type = data.type;
+					if (type == 'wxsm') { //表示扫码登录进入
+						var mycode = data.mycode;
+						if (mycode == sjm) {
+							var openid = data.data;
+
+							layer.close(index);
+							$.post(webname + "/wx/setWebSmInfo", {
+								openid: openid
+							}, function(d) {
+
+								layer.msg(d.msg);
+								if (d.code > 0) {
+									window.location.href = webname + "/webbussess/weblogin/toWebIndex";
+								}
+
+
+							})
+
+
+						}
+
+
+
+					}
+
+
+				}
+			}
+		</script>
+
+	</body>
+</html>

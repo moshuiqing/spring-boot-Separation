@@ -1,7 +1,5 @@
 package com.home.liuhao.other.weixin.po;
 
-import org.springframework.data.elasticsearch.annotations.Document;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(value="ReplyMsg",description="微信回复信息")
-@Document(indexName = "replymsg")    //必须小写
 public class ReplyMsg {
 	
 	@ApiModelProperty("主键id")
@@ -27,6 +24,6 @@ public class ReplyMsg {
 	@ApiModelProperty("是否删除")
 	private Integer isdel;
 	
-	private Integer sort;
+	private String sort;
 
 }
