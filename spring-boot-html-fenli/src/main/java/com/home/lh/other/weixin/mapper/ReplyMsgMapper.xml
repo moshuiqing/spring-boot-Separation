@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.other.weixin.mapper.ReplyMsgMapper">
+
+
+	<!-- 新增 -->
+	<insert id="insert"
+		parameterType="com.home.lh.other.weixin.po.ReplyMsg">
+		insert into replymsg(problem,answer) values(#{problem},#{answer})
+	</insert>
+
+	<!-- 删除 -->
+	<delete id="delete"
+		parameterType="com.home.lh.other.weixin.po.ReplyMsg">
+		delete from replymsg where id = #{id}
+	</delete>
+
+	<!-- 简易查询 -->
+	<select id="simpleFound"
+		parameterType="com.home.lh.other.weixin.po.ReplyMsg"
+		resultType="com.home.lh.other.weixin.po.ReplyMsg">
+		select * from replymsg
+		<where>
+			isdel = 0
+			<if test="id!=null and id!=''">and id=#{id}</if>
+		</where>
+	</select>
+
+	<!-- 修改 -->
+	<update id="update"
+		parameterType="com.home.lh.other.weixin.po.ReplyMsg">
+		update replymsg
+		<trim prefix="set" suffixOverrides=",">
+			problem=#{problem},
+			answer=#{answer},
+		</trim>
+		<where>
+			isdel=0 and id=#{id}
+		</where>
+	</update>
+
+	<select id="pageCount" resultType="java.lang.Integer" parameterType="com.home.lh.other.weixin.po.ReplyMsg">
+		select count(1) from replymsg
+		<where>
+			isdel=0 and id=#{id}
+		</where>
+	</select>
+
+	<select id="pageFound" resultType="com.home.lh.other.weixin.po.ReplyMsg">
+		select * from replymsg
+		<where>
+			isdel=0
+		</where>
+		<if test="start!=null and end!=null">
+			limit #{start} ,#{end}
+		</if>
+	</select>
+
+</mapper>

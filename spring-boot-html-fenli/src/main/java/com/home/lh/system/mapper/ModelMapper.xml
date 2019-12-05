@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.system.mapper.ModelMapper">
+
+	<select id="simepleFound" resultType="com.home.lh.system.po.Module">
+		select * from module
+	</select>
+
+
+</mapper>

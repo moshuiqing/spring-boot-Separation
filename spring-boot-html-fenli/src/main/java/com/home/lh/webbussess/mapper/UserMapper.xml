@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.webbussess.mapper.UserMapper">
+
+	<!-- 新增 -->
+	<insert id="insert"
+		parameterType="com.home.lh.webbussess.po.User">
+		insert into
+		user(id,birthday,HeadImg,phone,userName,password,salt,remark,createTime,realName)
+		values(#{id},#{birthday},#{HeadImg},#{phone},#{userName},#{password},#{salt},#{remark},now(),#{realName})
+	</insert>
+	
+	<!-- 新增 -->
+	<insert id="insert1"
+		parameterType="com.home.lh.webbussess.po.User">
+		insert into
+		user(id,userName,password,salt,createTime<if test="openid!=null">,openid</if><if test="realName!=null">,realName</if>)
+		values(#{id},#{userName},#{password},#{salt},now()<if test="openid!=null">,#{openid}</if><if test="realName!=null">,#{realName}</if>)
+	</insert>
+		<!-- 记录最后登录时间 -->
+	<update id="saveLoginTime" parameterType="com.home.lh.webbussess.po.User">
+		update user set userEndTime = now() where id=#{id}
+	</update>
+
+	<update id="update"
+		parameterType="com.home.lh.webbussess.po.User">
+		update user
+		<trim prefix="set" suffixOverrides=",">
+			<if test="birthday!=null and birthday!=''">birthday=#{birthday},</if>
+			<if test="HeadImg!=null and HeadImg!=''">HeadImg=#{HeadImg},</if>
+			<if test="phone!=null and phone!=''">phone=#{phone},</if>
+			<if test="userName!=null and userName!=''">userName=#{userName},</if>
+			<if test="password!=null and password!=''">password=#{password},</if>
+			<if test="salt!=null and salt!=''">salt=#{salt},</if>
+			<if test="remark!=null and remark!=''">remark=#{remark},</if>
+			<if test="isdisable!=null and isdisable!=''">isdisable=#{isdisable},</if>
+			<if test="openid!=null and openid!=''">openid=#{openid},</if>
+		</trim>
+		where id=#{id}
+	</update>
+
+	<update id="delete"
+		parameterType="com.home.lh.webbussess.po.User">
+		update user set isdel=1 where id=#{id}
+	</update>
+
+	<select id="simpleFound"
+		parameterType="com.home.lh.webbussess.po.User"
+		resultType="com.home.lh.webbussess.po.User">
+		select * from user
+		<where>
+			isdel = 0
+			<if test="id!=null and id!=''">and id=#{id}</if>
+			<if test="birthday!=null and birthday!=''">and birthday=#{birthday}</if>
+			<if test="HeadImg!=null and HeadImg!=''">and HeadImg=#{HeadImg}</if>
+			<if test="phone!=null and phone!=''">and phone=#{phone}</if>
+			<if test="userName!=null and userName!=''">and userName=#{userName}</if>
+			<if test="password!=null and password!=''">and password=#{password}</if>
+			<if test="salt!=null and salt!=''">and salt=#{salt}</if>
+			<if test="remark!=null and remark!=''">and remark=#{remark}</if>
+			<if test="openid!=null and openid!=''">and openid=#{openid}</if>
+		</where>
+	</select>
+
+	<select id="login"
+		parameterType="com.home.lh.webbussess.po.User"
+		resultType="com.home.lh.webbussess.po.User">
+		select * from user where isdel=0 and userName=#{userName}
+	</select>
+
+	<select id="pageCount" parameterType="com.home.lh.webbussess.po.User" resultType="java.lang.Integer">
+		select count(1) from user
+		<where>
+			isdel = 0
+			<if test="userName!=null and userName!=''">and userName like '${userName}'</if>
+		</where>
+	</select>
+	
+	<select id="pageFound" resultType="com.home.lh.webbussess.po.User">
+		select * from user
+		<where>
+			isdel = 0
+			<if test="u.userName!=null and u.userName!=''">and userName like '${u.userName}'</if>
+		</where>
+		order by createTime
+		<if test="start!=null and end!=null">
+			limit #{start} ,#{end}
+		</if>
+	</select>
+	 	<!-- 批量删除 -->
+ 	<update id="deletesWebUsers">
+ 			update user set isdel=1 where id in 
+ 			<foreach collection="uids" open="(" close=")" item="id" separator=",">
+ 				#{id}
+ 			</foreach>
+ 	</update>
+ 	
+ 
+ 	
+
+
+</mapper>

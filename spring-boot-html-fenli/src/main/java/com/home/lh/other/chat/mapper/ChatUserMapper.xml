@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.other.chat.mapper.ChatUserMapper">
+		
+
+		<!-- 根据id查询我的信息 -->
+		<select id="foundChatUser" parameterType="com.home.lh.other.chat.po.ChatUser" resultType="com.home.lh.other.chat.po.ChatUser">
+			SELECT u.username as username,u.sign as sign,u.`status` as `status`,u.id as id,u.headImg as avatar  from sysuser as u
+			<where>
+				u.isdel=0
+				<if test="id!=null and id!=''">and u.id=#{id}</if>
+			</where>
+		</select>
+		<!-- 查询发送者与接受者的聊天记录 (好友聊天记录)-->
+		<select id="getRecord"  resultType="com.home.lh.other.chat.po.ChatUser">
+			SELECT u.username username,u.id id ,u.headImg avatar,UNIX_TIMESTAMP(cr.`timestamp`)*1000 `timestamp`,cr.content from chatrecord cr
+ 			LEFT JOIN sysuser u on u.id = cr.sendId
+			WHERE (cr.sendId=#{sendId} or cr.sendId=#{toId}) and (cr.toId=#{toId} or cr.toId=#{sendId}) and cr.type=#{type}
+		</select>
+		<!-- 查询群组的聊天记录 -->
+		<select id="getGroupRecord" resultType="com.home.lh.other.chat.po.ChatUser">
+			SELECT u.username username,u.id id ,u.headImg avatar,
+			UNIX_TIMESTAMP(cr.`timestamp`)*1000 `timestamp`,cr.content from chatrecord cr
+			LEFT JOIN sysuser u on u.id = cr.sendId
+			WHERE cr.type='group' and cr.toId = #{id}			
+		</select>
+		
+		<!-- 聊天记录保存 -->
+		<insert id="insertRecord" parameterType="com.home.lh.other.chat.po.ChatRecord" keyProperty="id" useGeneratedKeys="true">
+			insert into ChatRecord(sendId,toId,content,timestamp,type)
+			values(#{sendId},#{toId},#{content},now(),#{type})
+		</insert>
+		
+		<!-- 修改信息状态 -->
+		<update id="updateState">
+			update chatrecord set state=1 where id=#{id}
+		</update>
+		<!-- 推荐好友 -->
+		<select id="getRecom" resultType="com.home.lh.other.chat.po.ChatUser">
+			select  u.id id,username,u.headImg avatar,u.sign sign from sysuser u  WHERE id!=#{uid}  and `status`='online' ORDER BY userEndTime DESC LIMIT 10
+		</select>
+		<!-- 查询用户数量 -->
+		<select id="getCount" resultType="java.lang.Integer">
+			select count(1) from sysuser where isdel=0 and id!=#{uid}
+			<if test="username!=null and username!=''">
+				and username like '%${username}%'
+			</if>
+		</select>
+		<!-- 分页查询 -->
+		<select id="getPage" resultType="com.home.lh.other.chat.po.ChatUser">
+			select u.id id,username,u.headImg avatar,u.sign sign from sysuser u  WHERE isdel=0 and id!=#{id}
+			<if test="username!=null and username!=''">
+				and username like '%${username}%'
+			</if>
+			<if test="start!=null and end!=null">
+			limit #{start} ,#{end}
+			</if>
+		</select>
+		<!-- 查询好友资料 -->
+		<select id="fondFrendData" resultType="com.home.lh.system.po.Person">
+			SELECT p.*,s.sign sign from sysuser s LEFT JOIN person p on s.pid=p.id  where s.id = #{id}		
+		</select>
+		
+</mapper>

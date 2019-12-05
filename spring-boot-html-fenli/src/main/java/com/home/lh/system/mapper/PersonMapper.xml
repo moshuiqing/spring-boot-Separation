@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.system.mapper.PersonMapper">
+	
+	<sql id="key">
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">id,</if>
+			<if test="name!=null and name!=''">name,</if>
+			<if test="phone!=null and phone!=''">phone,</if>
+			<if test="gender!=null and gender!=''">gender,</if>
+			<if test="city!=null and city!=''">city,</if>
+			<if test="email!=null and email!=''">email,</if>
+			<if test="myself!=null and myself!=''">myself,</if>
+			<if test="headimg!=null and headimg!=''">headimg,</if>
+			<if test="birthday!=null and birthday!=''">birthday,</if>			
+		</trim>	
+	</sql>
+	<sql id="value">
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">#{id},</if>
+			<if test="name!=null and name!=''">#{name},</if>
+			<if test="phone!=null and phone!=''">#{phone},</if>
+			<if test="gender!=null and gender!=''">#{gender},</if>
+			<if test="city!=null and city!=''">#{city},</if>
+			<if test="email!=null and email!=''">#{email},</if>
+			<if test="myself!=null and myself!=''">#{myself},</if>
+			<if test="headimg!=null and headimg!=''">#{headimg},</if>
+			<if test="birthday!=null and birthday!=''">#{birthday},</if>			
+		</trim>	
+	</sql>
+	
+
+
+	<!-- 新增人员信息 -->
+	<insert id="insertPerson" parameterType="com.home.lh.system.po.Person" >		
+		insert into person(<include refid="key"/>) values(<include refid="value"/>)
+	</insert>
+	<!-- 修改人员信息 -->
+	<update id="updatePerson" parameterType="com.home.lh.system.po.Person">
+		update person 
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name!=null and name!=''">name=#{name},</if>
+			<if test="phone!=null and phone!=''">phone=#{phone},</if>
+			<if test="gender!=null and gender!=''">gender=#{gender},</if>
+			<if test="city!=null and city!=''">city=#{city},</if>
+			<if test="email!=null and email!=''">email=#{email},</if>
+			<if test="myself!=null and myself!=''">myself=#{myself},</if>
+			<if test="headimg!=null and headimg!=''">headimg=#{headimg},</if>
+			<if test="birthday!=null and birthday!=''">birthday=#{birthday},</if>					
+		</trim> 
+		<where>
+			id = #{id}
+		</where>
+		
+	</update>
+ 
+</mapper>

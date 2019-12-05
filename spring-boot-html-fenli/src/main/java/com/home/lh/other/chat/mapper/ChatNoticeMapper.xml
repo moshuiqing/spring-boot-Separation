@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.other.chat.mapper.ChatNoticeMapper">
+
+
+	<resultMap type="com.home.lh.other.chat.po.ChatNotice" id="NoticeMapper">
+		<id property="id" column="id"/>
+		<result property="content" column="content"/>
+		<result property="uid" column="uid"/>
+		<result property="from" column="from"/>
+		<result property="type" column="type"/>
+		<result property="remark" column="remark"/>
+		<result property="from_group" column="from_group"/>
+		<result property="href" column="href"/>
+		<result property="read" column="read"/>
+		<result property="time" column="time"/>
+		<collection property="user" ofType="com.home.lh.other.chat.po.ChatUser">
+			<result property="username" column="username" />
+			<result property="id" column="userid"/>
+			<result property="avatar" column="avatar" />
+			<result property="sign" column="sign" />
+		</collection>
+	</resultMap>
+	
+	<select id="getMsgBox" resultMap="NoticeMapper">
+		SELECT c.id,c.type,c.remark,c.from_group,c.uid,c.`from`,c.`read`,c.href,c.content,u.username,u.id userid,u.headimg avatar,u.sign,
+		if((TIMESTAMPDIFF(DAY, c.time, NOW()))='0',CONVERT('刚刚',CHAR),concat(CONVERT(TIMESTAMPDIFF(DAY, c.time, NOW()),CHAR),"天前")) 
+		time from chatnotice c LEFT JOIN sysuser u  on u.id=c.`from` WHERE c.`read`=0  and c.uid=#{uid}
+	</select>
+		
+		<sql id="key">
+			<trim suffixOverrides=",">
+				<if test="content!=null and content!=''">content,</if>
+				<if test="uid!=null and uid!=''">uid,</if>
+				<if test="from!=null and from!=''">`from`,</if>
+				<if test="type!=null and type!=''">type,</if>
+				<if test="remark!=null and remark!=''">remark,</if>
+				<if test="from_group!=null and from_group!=''">from_group,</if>
+				time,
+			</trim>
+		</sql>
+		<sql id="value">
+			<trim suffixOverrides=",">
+				<if test="content!=null and content!=''">#{content},</if>
+				<if test="uid!=null and uid!=''">#{uid},</if>
+				<if test="from!=null and from!=''">#{from},</if>
+				<if test="type!=null and type!=''">#{type},</if>
+				<if test="remark!=null and remark!=''">#{remark},</if>
+				<if test="from_group!=null and from_group!=''">#{from_group},</if>
+				now(),
+			</trim>
+		</sql>
+
+		
+		<!-- 新增 -->
+		<insert id="insertNotice" parameterType="com.home.lh.other.chat.po.ChatNotice" keyProperty="id" useGeneratedKeys="true">
+			insert into ChatNotice(<include refid="key"/>) 
+			value(<include refid="value"/>)
+		</insert>
+		
+		<!-- 查询 -->
+		<select id="getNoticeByid" parameterType="com.home.lh.other.chat.po.ChatNotice" resultType="com.home.lh.other.chat.po.ChatNotice">
+			select * from ChatNotice 
+			<where>
+				<if test="id!=null and id!=''">and id =#{id}</if>
+				<if test="uid!=null and uid!=''">and uid=#{uid}</if>
+				<if test="from!=null and from!=''">and `from`=#{from}</if>
+				<if test="type!=null and type!=''">and type =#{type}</if>
+				<if test="read!=null and read!=''">and `read`=#{read}</if>
+
+			</where>			
+		</select>
+		<!-- 修改消息状态根据id -->
+		<update id="updateNoticeRead">
+			update ChatNotice set `read`=1 where id=#{id}
+		</update>
+		<!-- 修改接受者系统消息状态 -->
+		<update id="upUidRead" parameterType="com.home.lh.other.chat.po.ChatNotice">
+			update ChatNotice set `read`=1 where uid=#{uid} and type=3 and `read`=0
+		</update>
+		
+		<!-- 查询发给我的未读消息 -->
+		<select id="getNoReadByUid" resultType="java.lang.Integer">
+			SELECT count(1) from chatnotice WHERE `read` = 0 and uid=#{uid}
+		</select>
+		
+		<!-- 批量新增系统消息 -->
+		<insert id="insertsNotice">
+			<foreach collection="list" item="l" separator=";">
+				insert into ChatNotice(type,uid,content,time) values(#{l.type},#{l.uid},#{l.content},now())
+			</foreach>
+		</insert>
+</mapper>

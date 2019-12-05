@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.system.mapper.BigMenuMapper">
+
+
+
+	<sql id="key">
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">id,</if>
+			<if test="title!=null and title!=''">title,</if>
+			<if test="mpname!=null and mpname!=''">mpname,</if>
+			<if test="icon!=null and icon!=''">icon,</if>
+			<if test="sort!=null">sort,</if>
+		</trim>
+	</sql>
+	<sql id="values">
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">#{id},</if>
+			<if test="title!=null and title!=''">#{title},</if>
+			<if test="mpname!=null and mpname!=''">#{mpname},</if>
+			<if test="icon!=null and icon!=''">#{icon},</if>
+			<if test="sort!=null">#{sort},</if>
+		</trim>
+	</sql>
+
+	<!-- 查询全部横菜单 -->
+	<select id="simpleFound" resultType="com.home.lh.system.po.BigMenu" parameterType="com.home.lh.system.po.BigMenu">
+		select * from bigmenu  where isdel=0 order by sort
+	</select>	
+	
+	
+	<select id="pageCount"  resultType="java.lang.Integer">
+		select count(1) from bigmenu
+		<where>
+				isdel=0
+			<if test="title!=null and title!=''">and title=#{title}</if>
+			<if test="mpname!=null and mpname!=''">and mpname=#{mpname}</if>
+		</where>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insertMenu" parameterType="com.home.lh.system.po.BigMenu" keyProperty="id" useGeneratedKeys="true">
+		insert into BigMenu(<include refid="key"/>) values(<include refid="values"/>)	
+	</insert>
+	<!-- 修改 -->
+	<update id="updateMenu" parameterType="com.home.lh.system.po.BigMenu">
+		update BigMenu 
+			<trim prefix="set" suffixOverrides=",">
+				<if test="title!=null and title!=''">title=#{title},</if>
+				<if test="mpname!=null and mpname!=''">mpname=#{mpname},</if>
+				<if test="icon!=null and icon!=''">icon=#{icon},</if>
+				<if test="sort!=null">sort=#{sort},</if>
+				</trim>
+		where isdel = 0 and id =#{id}
+	</update>
+	<!-- 删除 -->
+	<update id="deleteMenu" parameterType="com.home.lh.system.po.BigMenu">
+		update BigMenu set isdel=1 where id=#{id}
+	</update>
+	
+</mapper>

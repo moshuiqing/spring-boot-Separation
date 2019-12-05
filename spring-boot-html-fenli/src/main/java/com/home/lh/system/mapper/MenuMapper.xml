@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.lh.system.mapper.MenuMapper">
+
+	<sql id="key">
+		<trim suffixOverrides=",">
+			<if test="title!=null and title!=''">title,</if>
+			<if test="icon!=null and icon!=''">icon,</if>
+			<if test="href!=null and href!=''">href,</if>
+			<if test="parent!=null and parent!=''">parent,</if>
+			<if test="mpname!=null and mpname!=''">mpname,</if>
+			<if test="sort!=null and sort!=''">sort,</if>
+		</trim>
+	</sql>
+	<sql id="values">
+		<trim suffixOverrides=",">
+			<if test="title!=null and title!=''">#{title},</if>
+			<if test="icon!=null and icon!=''">#{icon},</if>
+			<if test="href!=null and href!=''">#{href},</if>
+			<if test="parent!=null and parent!=''">#{parent},</if>
+			<if test="mpname!=null and mpname!=''">#{mpname},</if>
+			<if test="sort!=null and sort!=''">#{sort},</if>
+		</trim>
+	</sql>
+	<!-- 查询全部菜单 -->
+	<select id="simpleFound"  resultType="com.home.lh.util.Menus" parameterType="com.home.lh.util.Menus">
+		select * from menu
+		<where>
+				isdel = 0
+			<if test="mpName!=null and mpName!=''">and mpname=#{mpName}</if>
+			<if test="parent!=null and parent!=''">and parent=#{parent}</if>
+			<if test="parent==null and parent!=''">and parent is null</if>
+		</where>
+		order by sort
+	</select>
+	
+	<!-- 删除 -->
+	<update id="deleteMenus" parameterType="com.home.lh.system.po.Menu">
+		update  Menu set isdel=1 
+		<where>
+			<if test="id!=null and id!=''">and id=#{id}</if>
+			<if test="mpname!=null and mpname!=''">and mpname=#{mpname}</if>
+			<if test="parent!=null and parent!=''">or parent=#{parent}</if>
+		</where>
+
+	</update>
+	<!-- 新增 -->
+	<insert id="insertMenus" parameterType="com.home.lh.system.po.Menu" keyProperty="id" useGeneratedKeys="true">
+		insert into Menu(<include refid="key"/>) values(<include refid="values"/>)
+	</insert>
+	<!-- 修改 -->
+	<update id="updateMenus" parameterType="com.home.lh.system.po.Menu">
+		update Menu
+		<trim prefix="set" suffixOverrides=",">
+			<if test="title!=null and title!=''">title=#{title},</if>
+			<if test="icon!=null and icon!=''">icon=#{icon},</if>
+			<if test="href!=null">href=#{href},</if>
+			<if test="parent!=null and parent!=''">parent=#{parent},</if>
+			<if test="mpname!=null and mpname!=''">menu1=#{mpname},</if>
+			<if test="sort!=null and sort!=''">sort=#{sort},</if>
+		</trim>
+		where id=#{id}
+	</update>
+	
+	<select id="countNum" parameterType="com.home.lh.system.po.Menu" resultType="java.lang.Integer">
+		select count(1) from menu
+		<where>
+			isdel = 0
+			<if test="title!=null and title!=''">and title=#{title}</if>
+			<if test="mpname!=null and mpname!=''">and menu1=#{menu1}</if>
+		</where>
+	</select>
+	
+
+	
+</mapper>
