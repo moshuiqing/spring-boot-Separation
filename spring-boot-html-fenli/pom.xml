@@ -41,12 +41,8 @@
 			<version>2.1.0</version>
 		</dependency>
 		<!-- 自动重启 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
+		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-devtools</artifactId> 
+			<scope>runtime</scope> <optional>true</optional> </dependency> -->
 		<!-- mysql 连接 -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -259,39 +255,69 @@
 
 		<!-- 微信开发所用 结束 -->
 
-		<!-- 视频截图用-->
-		 <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacv</artifactId>
-            <version>1.4.3</version>
-        </dependency>
- 
-        <dependency>
-            <groupId>org.bytedeco.javacpp-presets</groupId>
-            <artifactId>ffmpeg-platform</artifactId>
-            <version>4.0.2-1.4.3</version>
-        </dependency>
-        
-        <!-- 表格操作 -->
+		<!-- 视频截图用 -->
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacv</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bytedeco.javacpp-presets</groupId>
+			<artifactId>ffmpeg-platform</artifactId>
+			<version>4.0.2-1.4.3</version>
+		</dependency>
+
+		<!-- 表格操作 -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.11</version>
+			<version>4.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.11</version>
+			<version>4.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-scratchpad</artifactId>
-			<version>3.11</version>
+			<version>4.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml-schemas</artifactId>
-			<version>3.11</version>
+			<version>4.1.0</version>
+		</dependency>
+
+
+		<!-- aes加密 -->
+		<dependency>
+			<groupId>sun.misc</groupId>
+			<artifactId>BASE64Decoder</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>sun.misc</groupId>
+			<artifactId>BASE64Encoder</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<!-- aes加密 结束 -->
+
+		<!--sentinel -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-sentinel -->
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+			<version>2.1.0.RELEASE</version>
+		</dependency>
+		<!--sentinel end -->
+
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>jep</artifactId>
+			<version>2.4.2</version>
 		</dependency>
 
 

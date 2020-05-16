@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.home.lh.other.chat.app.po.AppChatFriend;
+import com.home.lh.other.chat.app.service.AppCfService;
 import com.home.lh.other.chat.po.ChatFriend;
 import com.home.lh.other.chat.service.ChatFriendService;
 import com.home.lh.system.po.BigMenu;
@@ -100,6 +102,9 @@ public class MainController {
 
 	@Autowired
 	private SessionDAO sessionDAO;
+	
+	@Autowired
+	private AppCfService appCFService;
 
 	@RequestMapping(value = "toMain", method = RequestMethod.GET)
 	@ApiOperation("进入首页")
@@ -1231,11 +1236,18 @@ public class MainController {
 
 	}
 
+	@Transactional
 	@ResponseBody
 	@RequestMapping(value = "addWebUser", method = RequestMethod.POST)
 	@ApiOperation("新增用户")
 	public JsonMap addWebUser(User u) {
 		Integer result = webUserService.insert1(u);
+		if(result>0) {
+			AppChatFriend chatFriend = new AppChatFriend();
+			chatFriend.setGoupUserid(u.getId());
+			chatFriend.setGroupname("我的好友");
+			result=appCFService.addAppCf(chatFriend);
+		}
 		return SimpleUtils.addOruPdate(result, null, null);
 	}
 

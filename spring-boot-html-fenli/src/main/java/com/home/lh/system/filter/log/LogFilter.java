@@ -24,6 +24,7 @@ import com.home.lh.system.po.SysUser;
 import com.home.lh.system.po.Syslog;
 import com.home.lh.system.service.SysLogService;
 import com.home.lh.util.systemutil.DateUtils;
+import com.home.lh.util.systemutil.SimpleUtils;
 import com.home.lh.util.systemutil.SystemUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +102,7 @@ public class LogFilter implements Filter {
 			}
 			Syslog syslog = new Syslog();
 			syslog.setUrl(url);
-			syslog.setIp(ip);
+			syslog.setIp(SimpleUtils.getIpAddress(httpRequest));
 			syslog.setIsAbnormal(isAbnormal);
 			syslog.setMethod(method);
 			syslog.setOperator(name);

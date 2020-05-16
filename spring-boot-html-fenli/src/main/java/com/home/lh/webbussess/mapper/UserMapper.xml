@@ -6,8 +6,8 @@
 	<insert id="insert"
 		parameterType="com.home.lh.webbussess.po.User">
 		insert into
-		user(id,birthday,HeadImg,phone,userName,password,salt,remark,createTime,realName)
-		values(#{id},#{birthday},#{HeadImg},#{phone},#{userName},#{password},#{salt},#{remark},now(),#{realName})
+		user(id,birthday,headImg,phone,userName,password,salt,remark,createTime,realName)
+		values(#{id},#{birthday},#{headImg},#{phone},#{userName},#{password},#{salt},#{remark},now(),#{realName})
 	</insert>
 	
 	<!-- 新增 -->
@@ -27,7 +27,7 @@
 		update user
 		<trim prefix="set" suffixOverrides=",">
 			<if test="birthday!=null and birthday!=''">birthday=#{birthday},</if>
-			<if test="HeadImg!=null and HeadImg!=''">HeadImg=#{HeadImg},</if>
+			<if test="headImg!=null and headImg!=''">headImg=#{headImg},</if>
 			<if test="phone!=null and phone!=''">phone=#{phone},</if>
 			<if test="userName!=null and userName!=''">userName=#{userName},</if>
 			<if test="password!=null and password!=''">password=#{password},</if>
@@ -35,6 +35,7 @@
 			<if test="remark!=null and remark!=''">remark=#{remark},</if>
 			<if test="isdisable!=null and isdisable!=''">isdisable=#{isdisable},</if>
 			<if test="openid!=null and openid!=''">openid=#{openid},</if>
+			<if test="realName!=null and realName!=''">realName=#{realName},</if>
 		</trim>
 		where id=#{id}
 	</update>
@@ -49,10 +50,10 @@
 		resultType="com.home.lh.webbussess.po.User">
 		select * from user
 		<where>
-			isdel = 0
+			isdel = 0 and isdisable=0 
 			<if test="id!=null and id!=''">and id=#{id}</if>
 			<if test="birthday!=null and birthday!=''">and birthday=#{birthday}</if>
-			<if test="HeadImg!=null and HeadImg!=''">and HeadImg=#{HeadImg}</if>
+			<if test="headImg!=null and headImg!=''">and headImg=#{headImg}</if>
 			<if test="phone!=null and phone!=''">and phone=#{phone}</if>
 			<if test="userName!=null and userName!=''">and userName=#{userName}</if>
 			<if test="password!=null and password!=''">and password=#{password}</if>
@@ -65,13 +66,13 @@
 	<select id="login"
 		parameterType="com.home.lh.webbussess.po.User"
 		resultType="com.home.lh.webbussess.po.User">
-		select * from user where isdel=0 and userName=#{userName}
+		select * from user where isdel=0 and isdisable=0 and userName=#{userName}
 	</select>
 
 	<select id="pageCount" parameterType="com.home.lh.webbussess.po.User" resultType="java.lang.Integer">
 		select count(1) from user
 		<where>
-			isdel = 0
+			isdel = 0 and isdisable=0 
 			<if test="userName!=null and userName!=''">and userName like '${userName}'</if>
 		</where>
 	</select>
@@ -79,7 +80,7 @@
 	<select id="pageFound" resultType="com.home.lh.webbussess.po.User">
 		select * from user
 		<where>
-			isdel = 0
+			isdel = 0 and isdisable=0 
 			<if test="u.userName!=null and u.userName!=''">and userName like '${u.userName}'</if>
 		</where>
 		order by createTime

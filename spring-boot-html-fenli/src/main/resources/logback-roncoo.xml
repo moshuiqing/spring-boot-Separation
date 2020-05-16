@@ -16,9 +16,9 @@
 			</encoder>
 		</appender>
 		
-		<logger name="com.home.liuhao" level="debug"/>
+		<logger name="com.home.lh" level="debug"/>
 
-		<root level="info">
+		<root level="error">
 			<appender-ref ref="CONSOLE" />
 		</root>
 	</springProfile>

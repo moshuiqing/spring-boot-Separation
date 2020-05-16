@@ -21,8 +21,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -135,15 +140,15 @@ public class ExportExcelUtil<T> {
 		XSSFCellStyle style = workbook.createCellStyle();
 		// 设置这些样式
 		style.setFillForegroundColor(new XSSFColor(java.awt.Color.gray));
-		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		style.setBorderBottom(CellStyle.BORDER_THIN);
-		style.setBorderLeft(CellStyle.BORDER_THIN);
-		style.setBorderRight(CellStyle.BORDER_THIN);
-		style.setBorderTop(CellStyle.BORDER_THIN);
-		style.setAlignment(CellStyle.ALIGN_CENTER);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
 		// 生成一个字体
 		XSSFFont font = workbook.createFont();
-		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		font.setFontName("宋体");
 		font.setColor(new XSSFColor(java.awt.Color.BLACK));
 		font.setFontHeightInPoints((short) 11);
@@ -152,16 +157,16 @@ public class ExportExcelUtil<T> {
 		// 生成并设置另一个样式
 		XSSFCellStyle style2 = workbook.createCellStyle();
 		style2.setFillForegroundColor(new XSSFColor(java.awt.Color.WHITE));
-		style2.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		style2.setBorderBottom(CellStyle.BORDER_THIN);
-		style2.setBorderLeft(CellStyle.BORDER_THIN);
-		style2.setBorderRight(CellStyle.BORDER_THIN);
-		style2.setBorderTop(CellStyle.BORDER_THIN);
-		style2.setAlignment(CellStyle.ALIGN_CENTER);
-		style2.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style2.setVerticalAlignment(VerticalAlignment.CENTER);
 		// 生成另一个字体
 		XSSFFont font2 = workbook.createFont();
-		font2.setBoldweight(Font.BOLDWEIGHT_NORMAL);
+		font2.setBold(true);
 		// 把字体应用到当前的样式
 		style2.setFont(font2);
 
@@ -291,34 +296,34 @@ public class ExportExcelUtil<T> {
 		// 生成一个样式
 		HSSFCellStyle style = workbook.createCellStyle();
 		// 设置这些样式
-		style.setFillForegroundColor(HSSFColor.GREY_50_PERCENT.index);
-		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		style.setBorderBottom(CellStyle.BORDER_THIN);
-		style.setBorderLeft(CellStyle.BORDER_THIN);
-		style.setBorderRight(CellStyle.BORDER_THIN);
-		style.setBorderTop(CellStyle.BORDER_THIN);
-		style.setAlignment(CellStyle.ALIGN_CENTER);
+		style.setFillBackgroundColor(IndexedColors.GREY_50_PERCENT.index);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
 		// 生成一个字体
 		HSSFFont font = workbook.createFont();
-		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		font.setFontName("宋体");
-		font.setColor(HSSFColor.WHITE.index);
+		font.setColor(IndexedColors.WHITE.index);
 		font.setFontHeightInPoints((short) 11);
 		// 把字体应用到当前的样式
 		style.setFont(font);
 		// 生成并设置另一个样式
 		HSSFCellStyle style2 = workbook.createCellStyle();
-		style2.setFillForegroundColor(HSSFColor.WHITE.index);
-		style2.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		style2.setBorderBottom(CellStyle.BORDER_THIN);
-		style2.setBorderLeft(CellStyle.BORDER_THIN);
-		style2.setBorderRight(CellStyle.BORDER_THIN);
-		style2.setBorderTop(CellStyle.BORDER_THIN);
-		style2.setAlignment(CellStyle.ALIGN_CENTER);
-		style2.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style2.setFillForegroundColor(IndexedColors.WHITE.index);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style2.setVerticalAlignment(VerticalAlignment.CENTER);
 		// 生成另一个字体
 		HSSFFont font2 = workbook.createFont();
-		font2.setBoldweight(Font.BOLDWEIGHT_NORMAL);
+		font2.setBold(true);
 		// 把字体应用到当前的样式
 		style2.setFont(font2);
 

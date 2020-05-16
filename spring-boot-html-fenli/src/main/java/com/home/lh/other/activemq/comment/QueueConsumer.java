@@ -3,13 +3,10 @@ package com.home.lh.other.activemq.comment;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.home.lh.other.activemq.util.DuiLeiHd;
-import com.home.lh.other.liucheng.Globalvariable;
 import com.home.lh.util.Global;
 
 import lombok.extern.slf4j.Slf4j;

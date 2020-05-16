@@ -8,6 +8,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -24,56 +25,61 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 前端用户realm
+ * 
  * @author liuhao
  *
  */
 @Slf4j
-public class WebUserRealm extends AuthorizingRealm{
-	
-	
+public class WebUserRealm extends AuthorizingRealm {
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private EhCacheManager ehCacheManager;
 	@Value("${number}")
 	private Integer number;
-	
-	
+
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		
-		return null;
+		// 添加资源授权 字符串
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		info.addStringPermission("新增");
+		info.addStringPermission("修改");
+		info.addStringPermission("删除");
+		info.addStringPermission("查找");
+		info.addStringPermission("发送");
+		return info;
 	}
 
 	@SuppressWarnings("unused")
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		
+
 		log.info("web开始认证");
-		User u = new User();	
+		User u = new User();
 		String password = null;
-		UserToken userToken =(UserToken) token;
+		UserToken userToken = (UserToken) token;
 		char[] b = userToken.getPassword();
 		StringBuffer s = new StringBuffer();
 		for (int i = 0; i < b.length; i++) {
 			s.append(b[i]);
 		}
-		if(userToken.getUsername()!=null && !userToken.getUsername().equals("")) {
+		if (userToken.getUsername() != null && !userToken.getUsername().equals("")) {
 			u.setUserName(userToken.getUsername());
 			u = userService.login(u);
-			if(u!=null) {
+			if (u != null) {
 				u.setLoginType(userToken.getLoginType());
 				u.setStrmsg(s.toString());
 			}
-			
-			if(u!=null && u.getIsdisable().equals("1")) {
+
+			if (u != null && u.getIsdisable().equals("1")) {
 				throw new ExcessiveAttemptsException("账号: " + u.getUserName() + "已被禁用，请联系管理员！");
 			}
-			
-			if(u==null) {
+
+			if (u == null) {
 				return null;
-			}else {
+			} else {
 				Cache<String, AtomicInteger> passwordRetryCache = ehCacheManager.getCache("webEacache");
 				// retry count + 1 自增
 				AtomicInteger retryCount = passwordRetryCache.get(u.getUserName() + "web");
@@ -86,22 +92,16 @@ public class WebUserRealm extends AuthorizingRealm{
 					throw new ExcessiveAttemptsException("账号: " + u.getUserName() + "尝试次数超出" + number + "次.，请一小时后再试！");
 				}
 				password = u.getPassword();
-				
+
 			}
 			// 判断密码
 			SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(u, password, getName());
 			authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(u.getSalt()));
 			return authenticationInfo;
-			
-			
-			
+
 		}
-		
-		
+
 		return null;
 	}
-	
-	
-	 
 
 }

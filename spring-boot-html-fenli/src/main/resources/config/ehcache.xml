@@ -32,6 +32,12 @@
 		overflowToDisk="false" statistics="true">
 	</cache>
 	
+	<!-- app登录记录缓存锁定一小时 -->
+	<cache name="appEacache" maxEntriesLocalHeap="2000"
+		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="0"
+		overflowToDisk="false" statistics="true">
+	</cache>
+	
 	  
     <!-- 第三方授权token可用时间2小时-->
     <cache name="authorToken"

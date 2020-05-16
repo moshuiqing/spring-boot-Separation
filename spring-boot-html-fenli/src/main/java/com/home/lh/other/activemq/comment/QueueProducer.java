@@ -1,8 +1,6 @@
 package com.home.lh.other.activemq.comment;
 
 import javax.jms.MapMessage;
-import javax.jms.Queue;
-import javax.jms.Topic;
 
 import org.apache.activemq.command.ActiveMQMapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +42,14 @@ public class QueueProducer {
 	public void send() {
 		try {
 
+			Global.setDuiLeiHd(new DuiLeiHd() {
+				@Override
+				public void setStop() {
+					log.info("结束");
+					flag=false;
+				}
+			});
+
 			if (flag) {
 				i++;
 				MapMessage mapMessage = new ActiveMQMapMessage();
@@ -51,13 +57,6 @@ public class QueueProducer {
 				//this.jmsMessagingTemplate.convertAndSend("liuhao.queue", mapMessage);
 				//log.info("发送请求");
 
-				Global.setDuiLeiHd(new DuiLeiHd() {
-					@Override
-					public void setStop() {
-						log.info("结束");
-						flag=false;
-					}
-				});
 			}else {
 				
 			}

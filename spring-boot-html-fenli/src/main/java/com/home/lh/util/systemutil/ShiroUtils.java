@@ -30,7 +30,7 @@ public class ShiroUtils {
     			new SimplePrincipalCollection(userInfo, realmName);
     	subject.runAs(newPrincipalCollection);
     }
-    public static void setsmUser(User user,String name) {
+    public static void setsmUser(User user) {
     	Subject subject = SecurityUtils.getSubject();
     	PrincipalCollection principalCollection = subject.getPrincipals(); 
     	String realmName = principalCollection.getRealmNames().iterator().next();

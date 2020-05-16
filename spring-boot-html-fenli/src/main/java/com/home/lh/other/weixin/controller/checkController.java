@@ -89,7 +89,7 @@ public class checkController {
 			textMessage.setMsgType("text");
 			String eventkey = map.get("EventKey");
 
-			String flag;
+			//String flag;
 			if (eventkey != null && eventkey.length() >= 38) {
 				String redirect_uri = WxGlobal.yuming + WxGlobal.SMHD;
 				redirect_uri = redirect_uri.replace("myCODE", eventkey);
@@ -115,10 +115,12 @@ public class checkController {
 			if (flag) {
 				Optional<MsgStrInfo> replyMsg = replyMsgSearch.findById(Integer.parseInt(c));
 				msg.setContent(replyMsg.get().getAnswer());
+			}else {
+				msg.setContent("不知道你在说什么，请按提示回复！");
 			}
 		}
 
-		if (key != null && key.equals("autoChat")) {
+		if (key != null && (key.equals("autoChat")||key.equals("qrscene_autoChat"))) {
 			// 表示聊天
 			Sort sort = Sort.by(Order.desc("id").getProperty());
 			Iterable<MsgStrInfo> replyMsgs = replyMsgSearch.findAll(sort);

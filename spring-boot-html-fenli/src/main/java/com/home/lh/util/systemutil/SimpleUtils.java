@@ -87,12 +87,15 @@ public class SimpleUtils {
 	 */
 	public static JsonMap addOruPdate(Integer code, Object obj, String msg) {
 		JsonMap jp = new JsonMap();
-		if (code > 0) {
+		if (code == 1) {
 			jp.setCode(1);
-			jp.setMsg("操作成功！");
+			if(StringUtils.isEmpty(msg)) {
+				msg="操作成功！";
+			}
+			jp.setMsg(msg);
 			jp.setObject(obj);
 		} else if (code == -1) {
-			jp.setCode(-1);
+			jp.setCode(-1);			
 			jp.setMsg("操作失败！");
 			jp.setObject(obj);
 		} else if (code == -2) {
@@ -200,5 +203,7 @@ public class SimpleUtils {
 		return sj+"";
 
 	}
+	
+
 
 }

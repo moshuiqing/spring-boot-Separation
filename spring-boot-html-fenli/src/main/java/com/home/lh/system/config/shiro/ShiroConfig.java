@@ -222,6 +222,11 @@ public class ShiroConfig {
 		securityManager.setCacheManager(ehCacheManager());
 		// //注入session管理器;
 		securityManager.setSessionManager(configWebSessionManager());
+		 //====================多realm授权核心代码===================
+        CustomizedModularRealmAuthorizer authorizer = new CustomizedModularRealmAuthorizer();
+        authorizer.setRealms(realms);
+        securityManager.setAuthorizer(authorizer);
+        //====================多realm授权核心代码===================
 
 		return securityManager;
 	}
@@ -367,6 +372,7 @@ public class ShiroConfig {
 		filterMap.put("/*/*/update*", "perms[修改]");
 		filterMap.put("/*/*/delete*", "perms[删除]");
 		filterMap.put("/*/*/found*", "perms[查找]");
+		filterMap.put("/*/*/send*", "perms[发送]");
 
 		// 自定义拦截器
 		Map<String, Filter> filtersMap = shiroFilterFactoryBean.getFilters();
@@ -389,10 +395,14 @@ public class ShiroConfig {
 		filterMap.put("/webbussess/weblogin/resetPwd", "anon");//邮件重置密码放行
 		filterMap.put("/webbussess/weblogin/toRegister", "anon");//前台跳转注册放行
 		filterMap.put("/webbussess/weblogin/register", "anon");//前台注册放行
-		filterMap.put("/appdesk/appUser/backPrompt", "anon");//app跳转未登录提示放行
-		filterMap.put("/appdesk/appUser/applogin","anon");//app登录跳转
-		filterMap.put("/appdesk/appUser/appVersion", "anon");//app版本验证是否需要更新
 		filterMap.put("/baidu/eduit/config", "anon");// 百度编辑器配置放行
+		filterMap.put("/appdesk/appUser/**", "anon");
+		filterMap.put("/appdesk/appSys/getAppSys","anon");//获取初始化信息放行
+		//filterMap.put("/appdesk/appUser/backPrompt", "anon");//app跳转未登录提示放行
+		//filterMap.put("/appdesk/appUser/applogin","anon");//app登录跳转
+		//filterMap.put("/appdesk/appUser/appVersion", "anon");//app版本验证是否需要更新		
+	
+		//filterMap.put("/appdesk/appUser/regist", "anon");//app注册放行
 		
 		
 		// 放行swagger
@@ -403,6 +413,7 @@ public class ShiroConfig {
 		filterMap.put("/v2/**", "anon");
 		filterMap.put("/druid/**", "anon");
 		filterMap.put("/", "anon");
+		
 
 		filterMap.put("/backsystem/sysuser/sysLogin", "captchaVaildate");// 后台登录验证码过滤器
 		filterMap.put("/backsystem/**", "kickout,myauthc,user");// 后台方法验证过滤器

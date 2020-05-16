@@ -16,17 +16,21 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.home.lh.other.chat.app.po.AppChatFriend;
+import com.home.lh.other.chat.app.service.AppCfService;
 import com.home.lh.other.emalutil.EamilComment;
 import com.home.lh.other.weixin.util.WxGlobal;
 import com.home.lh.system.config.shiro.UserToken;
 import com.home.lh.system.config.shiro.po.LoginType;
 import com.home.lh.util.Global;
 import com.home.lh.util.JsonMap;
+import com.home.lh.util.systemutil.ShiroUtils;
 import com.home.lh.util.systemutil.SimpleUtils;
 import com.home.lh.webbussess.po.User;
 import com.home.lh.webbussess.service.UserService;
@@ -49,6 +53,9 @@ public class WebLoginController {
 
 	@Autowired
 	private EamilComment eamilComment;
+	
+	@Autowired
+	private AppCfService appCFService;
 
 	/**
 	 * 跳转前端登录页面
@@ -66,7 +73,7 @@ public class WebLoginController {
 	@RequestMapping(value = "webLogin", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation("前台登录")
-	public JsonMap login(User user,HttpServletRequest request,HttpServletResponse response) {
+	public JsonMap login(User user, HttpServletRequest request, HttpServletResponse response) {
 		JsonMap jMap = new JsonMap();
 		if (request.getAttribute("shiroLoginFailure") != null) {
 			jMap.setCode(-1);
@@ -91,7 +98,7 @@ public class WebLoginController {
 			Session session = subject.getSession();
 			session.setAttribute(Global.webUser, user2);
 			session.setAttribute(Global.loginType, Global.web);
-			
+
 			jMap.setCode(1);
 			jMap.setMsg("登录成功！");
 			log.info("登录成功");
@@ -120,7 +127,21 @@ public class WebLoginController {
 	@ApiOperation("跳转前台web首页")
 	public String toWebIndex() {
 
-		return "/liuhao/page/web/index/index";
+		Subject subject = SecurityUtils.getSubject();
+		User u = (User) subject.getPrincipal();
+		if (u != null) {
+			if (SimpleUtils.isEmpty(u.getRealName(), u.getBirthday(), u.getHeadImg(), u.getPhone(), u.getRemark())) {			
+				return "/liuhao/page/web/register/wanshan";
+
+			} else {
+
+				return "/liuhao/page/web/index/index";
+			}
+
+		} else {
+			return "/liuhao/page/web/login/login";
+		}
+
 	}
 
 	/**
@@ -201,6 +222,7 @@ public class WebLoginController {
 	 * 
 	 * @return
 	 */
+	@Transactional
 	@RequestMapping(value = "register", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation("注册")
@@ -215,6 +237,10 @@ public class WebLoginController {
 		} else {
 			Integer result = userService.insert(user);
 			if (result > 0) {
+				AppChatFriend chatFriend = new AppChatFriend();
+				chatFriend.setGoupUserid(u.getId());
+				chatFriend.setGroupname("我的好友");
+				result=appCFService.addAppCf(chatFriend);				
 				jm.setCode(1);
 				jm.setMsg("注册成功");
 			} else {
@@ -223,6 +249,32 @@ public class WebLoginController {
 			}
 		}
 		return jm;
+	}
+	
+	/**
+	 * 完善用户信息
+	 * @param u
+	 * @return
+	 */
+	@RequestMapping(value="perfect",method = RequestMethod.POST)
+	@ResponseBody
+	public JsonMap perfect(User u) {		
+		Integer result=-2;
+		if(!SimpleUtils.isEmpty(u.getBirthday(),u.getHeadImg(),u.getPhone(),u.getRealName(),u.getRemark())) {
+			Subject subject = SecurityUtils.getSubject();
+			User user = (User) subject.getPrincipal();
+			u.setId(user.getId());
+			result = userService.update(u);
+			if(result>0) {
+				u.setUserName(user.getUserName());
+				u.setSalt(user.getSalt());
+				u.setPassword(user.getPassword());
+				u.setOpenid(user.getOpenid());
+				ShiroUtils.setsmUser(u);
+			}
+			
+		}
+		return SimpleUtils.addOruPdate(result, null, null);
 	}
 
 }

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.home.lh.other.activemq.comment.ApolloClient;
 import com.home.lh.other.activemq.po.Msg;
-import com.home.lh.other.weixin.entity.WeiXinMoBan;
 import com.home.lh.other.weixin.entity.WeiXinUserInfo;
 import com.home.lh.other.weixin.util.WeiXinUtil;
 import com.home.lh.other.weixin.util.WxGlobal;
@@ -172,7 +171,7 @@ public class WxController {
 			if (pwd.equals(u.getPassword())) {
 				// 是这个用户直接绑定
 				String id = u.getId();
-				String openid = u.getOpenid();
+				String openid = user.getOpenid();
 				u = new User();
 				u.setId(id);
 				u.setOpenid(openid);
@@ -214,7 +213,8 @@ public class WxController {
 		JsonMap jm = new JsonMap();
 		if (user.getOpenid() != null && !user.getOpenid().equals("")) {
 
-			UserToken token = new UserToken(user.getOpenid(), user.getPassword(), LoginType.NOPASSWD,user.isRememberMe());
+			UserToken token = new UserToken(user.getOpenid(), user.getPassword(), LoginType.NOPASSWD,
+					user.isRememberMe());
 			Subject subject = SecurityUtils.getSubject();
 			try {
 				subject.login(token);
@@ -246,64 +246,24 @@ public class WxController {
 	@ApiOperation("生成永久二维码")
 	public JsonMap getPermanent() {
 		JsonMap jm = new JsonMap();
-		String str= stringRedisTemplate.opsForValue().get("gzewm");
+		String str = stringRedisTemplate.opsForValue().get("gzewm");
 		jm.setCode(1);
 		jm.setObject(str);
-		if(str==null ||str.equals("")) {
-			
+		if (str == null || str.equals("")) {
+
 			try {
-			    str= WeiXinUtil.qrTicket("autoChat");
-			    String url= WxGlobal.wxpicture.replace("TICKET", str);
-			    stringRedisTemplate.opsForValue().set("gzewm", url);
-			    jm.setObject(str);
+				str = WeiXinUtil.qrTicket("autoChat");
+				String url = WxGlobal.wxpicture.replace("TICKET", str);
+				stringRedisTemplate.opsForValue().set("gzewm", url);
+				jm.setObject(str);
 			} catch (Exception e) {
 				jm.setCode(-1);
 				e.printStackTrace();
-			} 
-		}
-		return jm;
-	}
-	
-	/**
-	 * 发送模板
-	 * @param user
-	 * @return
-	 */
-	@RequestMapping(value="sendWxMb",method=RequestMethod.POST)
-	@ResponseBody
-	@ApiOperation("发送模板信息")
-	public JsonMap sendWxMb(User user) {
-		JsonMap jm = new JsonMap();
-		user.setRealName("刘浩");
-		user.setOpenid("oJKSHwQ0c6mfKioiKcuBGNgYuA2E");
-		String info="";
-		if (user.getOpenid() != null) {
-			
-			try {
-				String money = "10000";
-				String data = "{\"keyword1\":{\"value\":\"" + user.getRealName()
-						+ "\",\"color\":\"#173177\"},\"keyword2\":{\"value\":\""
-						+ money + "\",\"color\":\"#173177\"}}";
-				WeiXinMoBan moBan = new WeiXinMoBan();
-				moBan.setTouser(user.getOpenid());
-				moBan.setTemplate_id("2Dj5XJ_XtpUDq5NLkfMh-oonHvQ98MAIEZg8kecDmJ4");
-				moBan.setUrl("https://www.baidu.com/");
-				moBan.setData(data);
-				info = WeiXinUtil.tuiSong(moBan);
-				jm.setCode(1);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-		} else {
-			info = "账号没有绑定微信公众号！";
-			jm.setCode(-1);
-			
 		}
-		jm.setMsg(info);
-		
 		return jm;
-		
-		
 	}
+
+	
 
 }

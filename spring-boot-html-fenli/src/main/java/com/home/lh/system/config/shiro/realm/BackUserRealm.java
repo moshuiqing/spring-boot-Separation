@@ -45,6 +45,8 @@ public class BackUserRealm extends AuthorizingRealm {
 	private EhCacheManager ehCacheManager;
 	@Value("${number}")
 	private Integer number;
+	
+	
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {

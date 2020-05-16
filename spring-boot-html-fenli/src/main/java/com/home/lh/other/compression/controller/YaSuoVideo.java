@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.home.lh.other.compression.CompressionVideo;
 import com.home.lh.other.compression.util.Screenshots;
-import com.home.lh.system.po.BigMenu;
 import com.home.lh.system.po.Syslog;
-import com.home.lh.system.service.BigMenuService;
 import com.home.lh.system.service.SysLogService;
 import com.home.lh.util.Global;
 import com.home.lh.util.JsonMap;

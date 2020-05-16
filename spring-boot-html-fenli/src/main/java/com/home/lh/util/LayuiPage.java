@@ -11,6 +11,21 @@ public class LayuiPage {
 	 * 页数
 	 */
 	private Integer page;
+	
+	
+	
+	
+
+
+	public LayuiPage() {
+		super();
+	}
+
+	public LayuiPage(Integer limit, Integer page) {
+		super();
+		this.limit = limit;
+		this.page = page;
+	}
 
 	public Integer getStart() {
 

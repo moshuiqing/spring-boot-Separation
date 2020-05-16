@@ -52,5 +52,7 @@ public interface ReplyMsgService {
 	 * @return
 	 */
 	List<ReplyMsg> pageFound(ReplyMsg msg,LayuiPage page);
+	
+	
 
 }

@@ -7,13 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
@@ -58,7 +56,8 @@ public class Screenshots
             if (file2.exists())
             {
 
-                FFmpegFrameGrabber ff = new FFmpegFrameGrabber(file2);
+                @SuppressWarnings("resource")
+				FFmpegFrameGrabber ff = new FFmpegFrameGrabber(file2);
                 ff.start();
                 int ftp = ff.getLengthInFrames();
                 int flag = 0;
@@ -67,8 +66,8 @@ public class Screenshots
                 {
                     // 获取帧
                     frame = ff.grabImage();
-                    // 过滤前5帧，避免出现全黑图片
-                    if ((flag > 5) && (frame != null))
+                    // 过滤前10帧，避免出现全黑图片
+                    if ((flag > 100) && (frame != null))
                     {
                         break;
                     }
@@ -88,8 +87,10 @@ public class Screenshots
         {
             e.printStackTrace();
             return null;
+        }finally {
+        	   fftp.ftpLogOut();
         }
-        fftp.ftpLogOut();
+     
 
         return imgUrl + rname;
     }

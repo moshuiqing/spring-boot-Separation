@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/web")
 public class WebIndexController {
-
+	
+	
 	
 	
 	/**
@@ -18,7 +19,6 @@ public class WebIndexController {
 	 */
 	@RequestMapping("")
 	public String toWebLogin() {
-
 		return "redirect:/webbussess/weblogin/toWebLogin";
 	}
 

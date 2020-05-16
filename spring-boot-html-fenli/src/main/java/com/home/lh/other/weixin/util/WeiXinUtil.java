@@ -29,14 +29,15 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.core.io.ClassPathResource;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.home.lh.other.weixin.entity.AccessToken;
 import com.home.lh.other.weixin.entity.JsapiTicket;
 import com.home.lh.other.weixin.entity.WeiXinMoBan;
 import com.home.lh.other.weixin.entity.WeiXinUserInfo;
 import com.home.lh.other.weixin.entity.WeixinGlobal;
+import com.home.lh.other.weixin.po.Template;
 import com.thoughtworks.xstream.XStream;
-
-import net.sf.json.JSONObject;
 
 /**
  * @author liuhao
@@ -63,7 +64,7 @@ public class WeiXinUtil {
 													// 中获取结果，类型为httpentity
 		if (entity != null) {
 			String result = EntityUtils.toString(entity, "Utf-8");// httpentity转为字符串类型
-			jsonObject = JSONObject.fromObject(result);// 字符串类型转为json类型
+			jsonObject = JSONObject.parseObject(result);// 字符串类型转为json类型
 		}
 		client.close();
 		return jsonObject;
@@ -86,7 +87,7 @@ public class WeiXinUtil {
 		HttpResponse response = client.execute(htppPost);// 使用httpresponse
 															// 接收client执行httpget的结果
 		String result = EntityUtils.toString(response.getEntity(), "Utf-8");// httpentity转为字符串类型
-		jsonObject = JSONObject.fromObject(result);// 字符串类型转为json类型
+		jsonObject = JSONObject.parseObject(result);// 字符串类型转为json类型
 		client.close();
 		return jsonObject;
 	}
@@ -100,10 +101,11 @@ public class WeiXinUtil {
 	 */
 	public static AccessToken getAccessToken() throws ClientProtocolException, IOException {
 		AccessToken token = new AccessToken();
-		JSONObject jsonObject = doGetStr(WxGlobal.ACCESS_TOKEN_URL.replace("APPID", WxGlobal.APPID).replace("APPSECRET", WxGlobal.APPSECRET));// 使用doget方法接收参数
+		JSONObject jsonObject = doGetStr(
+				WxGlobal.ACCESS_TOKEN_URL.replace("APPID", WxGlobal.APPID).replace("APPSECRET", WxGlobal.APPSECRET));// 使用doget方法接收参数
 		if (jsonObject != null) {// 如果返回不为空 ，将返回结果封装进AccessToken实体类
 			token.setToken(jsonObject.getString("access_token"));// 获取access_token
-			token.setExpiresIn(jsonObject.getInt("expires_in"));// 获取access_token的有效期
+			token.setExpiresIn(jsonObject.getInteger("expires_in"));// 获取access_token的有效期
 		}
 		return token;
 	}
@@ -126,7 +128,7 @@ public class WeiXinUtil {
 			HttpGet httpget = new HttpGet(requestUrl);
 			ResponseHandler<String> responseHandler = new BasicResponseHandler();
 			String response = client.execute(httpget, responseHandler);
-			JSONObject OpenidJSONO = JSONObject.fromObject(response);// 将String类型转为json
+			JSONObject OpenidJSONO = JSONObject.parseObject(response);// 将String类型转为json
 			String Openid = String.valueOf(OpenidJSONO.get("openid"));
 			String AccessToken = String.valueOf(OpenidJSONO.get("access_token"));
 			String Scope = String.valueOf(OpenidJSONO.get("scope"));// 用户保存的作用域
@@ -220,227 +222,243 @@ public class WeiXinUtil {
 		return result;
 	}
 
-	
 	/**
 	 * 随机字符串
+	 * 
 	 * @return
 	 */
 	private static String create_nonce_str() {
 		return UUID.randomUUID().toString();
 	}
 
-	
 	/**
 	 * 签名的时间戳
+	 * 
 	 * @return
 	 */
 	private static String create_timestamp() {
 		return Long.toString(System.currentTimeMillis() / 1000);
 	}
-	///*****************************************************************************/////
+	/// *****************************************************************************/////
+
+	/**
+	 * 获取二维码需要的ticket 生成永久二维码
+	 * 
+	 * @param info
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
+	public static String qrTicket(String info) throws ClientProtocolException, IOException, DocumentException {
+		WeixinGlobal global = useGetGlobal();
+		String url = WxGlobal.Qrcode_ticket.replace("TOKEN", global.getAccess_token());
+		String zhi = "{\"action_name\": \"QR_LIMIT_STR_SCENE\",\"action_info\": {\"scene\": {\"scene_str\": \"" + info
+				+ "\"}}}";
+
+		JSONObject object = doPostStr(url, zhi);
+		String qrticket = (String) object.get("ticket");
+		System.out.println(qrticket);
+		return qrticket;
+
+	}
+
+	/**
+	 * 文本消息转化为xml
+	 * 
+	 * @param textMessage
+	 * @return
+	 */
+	public static String textMessageToXml(Object textMessage) {
+		XStream xstream = new XStream();
+		xstream.alias("xml", textMessage.getClass());
+		return xstream.toXML(textMessage);
+
+	}
+
+	/**
+	 * 将xml转化为Map集合
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public static Map<String, String> xmlToMap(Document document) {
+		Map<String, String> map = new HashMap<String, String>();
+		Element rootElt = document.getRootElement();
+		List<Element> list = rootElt.elements();
+		for (Element e : list) {
+			map.put(e.getName(), e.getText());
+		}
+
+		return map;
+	}
+
+	/**
+	 * @return
+	 * @throws DocumentException
+	 * @throws ClientProtocolException
+	 * @throws IOException             得到微信全局信息
+	 */
+	public static WeixinGlobal useGetGlobal() throws DocumentException, ClientProtocolException, IOException {
+		WeiXinUtil weiXinUtil = new WeiXinUtil();
+
+		return weiXinUtil.getGlobal();
+
+	}
+
+	// 读取xml文件
+	public WeixinGlobal getGlobal() throws DocumentException, ClientProtocolException, IOException {
+		ClassPathResource cpr = new ClassPathResource("static/xml/weixininfo.xml");
+		File file = cpr.getFile();
+		// 创建saxReader对象
+		SAXReader reader = new SAXReader();
+
+		if (file.length() == 0) {
+			setWeixinInfo();
+		}
+		// 通过read方法读取一个文件 转换成Document对象
+		Document document = reader.read(file);
+		// 获取根节点元素对象
+		Element node = document.getRootElement();
+		// 获取access_token
+		Element element1 = node.element("access__token");
+		// 获取ticket
+		Element element2 = node.element("ticket");
+		// 获取存的时间
+		Element element3 = node.element("datetime");
+		WeixinGlobal global = new WeixinGlobal(element1.getText(), element2.getText(),
+				Long.parseLong(element3.getText()));
+
+		return global;
+
+	}
+
+	/**
+	 * 动态的获取ACCESS_TOKEN和ticket并生成xml文件
+	 * 
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
+	public static void setWeixinInfo() throws ClientProtocolException, IOException {
+
+		// 获取token
+		AccessToken token = getAccessToken();
+		JsapiTicket ticket = getJsapiTicket(token.getToken());
+		WeixinGlobal global = new WeixinGlobal();
+		global.setAccess_token(token.getToken());
+		global.setTicket(ticket.getTicket());
+		global.setDatetime(System.currentTimeMillis());
+		String xmlinfo = textMessageToXml(global);
+		System.out.println(xmlinfo);
+		useWriteXml(xmlinfo);
+
+	}
+
+	/**
+	 * 写入文件
+	 * 
+	 * @param filename 文件名称
+	 * @param info     文件信息
+	 * @throws IOException
+	 */
+	public static void useWriteXml(String info) throws IOException {
+
+		WeiXinUtil xinUtil = new WeiXinUtil();
+		xinUtil.writeXml(info);
+
+	}
+
+	/**
+	 * @param filename 文件名称
+	 * @param info     文件内容
+	 * @throws IOException
+	 */
+	public void writeXml(String info) throws IOException {
+
+		ClassPathResource cpr = new ClassPathResource("static/xml/weixininfo.xml");
+		File file = cpr.getFile();
+		FileWriter writer = new FileWriter(file);
+		writer.write(info);
+		writer.close();
+
+	}
+
+	/**
+	 * 获取用户信息
+	 * 
+	 * @param code
+	 * @return
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
+	public static WeiXinUserInfo getUserInfo(String code) throws ClientProtocolException, IOException {
+		Map<String, Object> map = WeiXinUtil.oauth2GetOpenid(code);
+		String openid = (String) map.get("Openid");
+		String AccessToken = (String) map.get("AccessToken");
+		// String Expires_in = (String) map.get("");
+		// 获取用户信息
+		String url = WxGlobal.wxuserinfo.replace("ACCESS_TOKEN", AccessToken).replace("OPENID", openid);
+		JSONObject object = WeiXinUtil.doGetStr(url);
+		WeiXinUserInfo rule = (WeiXinUserInfo) JSONObject.toJavaObject(object, WeiXinUserInfo.class);
+		// System.out.println(rule.toString());
+		return rule;
+	}
+
+	/**
+	 * 获取微信模板
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 * @throws DocumentException
+	 */
+	public static List<Template> getlistMb() throws ClientProtocolException, IOException, DocumentException {
+		WeixinGlobal global = useGetGlobal();
+		String url = WxGlobal.wxTemplates.replace("ACCESS_TOKEN", global.getAccess_token());
+		JSONObject object = WeiXinUtil.doGetStr(url);
+		JSONArray array = object.getJSONArray("template_list");
+		if (array != null) {
+			List<Template> list = JSONArray.parseArray(array.toJSONString(), Template.class);
+			return list;
+		}
+		System.out.println(1111);
+		return null;
+	}
+
+	// 获取临时二维码参数用作扫码登录
+	public static String getErWeiMa(String code) throws ClientProtocolException, DocumentException, IOException {
+		WeixinGlobal global = WeiXinUtil.useGetGlobal();
+		String token = global.getAccess_token();
+		String url = WxGlobal.lsewm.replace("TOKEN", token);
+
+		String shuju = "{\"expire_seconds\": 180,\"action_name\": \"QR_LIMIT_STR_SCENE\",\"action_info\": {\"scene\": {\"scene_str\":\""
+				+ code + "\"}}}";
+
+		JSONObject object = doPostStr(url, shuju);
+		String uri = (String) object.get("url");
+		return uri;
+
+	}
+
 	
-	
-		/**
-		 * 获取二维码需要的ticket 生成永久二维码
-		 * @param info
-		 * @return
-		 * @throws ClientProtocolException
-		 * @throws IOException
-		 * @throws DocumentException
-		 */
-		public static String qrTicket(String info) throws ClientProtocolException,
-				IOException, DocumentException {
-			WeixinGlobal global = useGetGlobal();
-			String url = WxGlobal.Qrcode_ticket.replace("TOKEN",
-					global.getAccess_token());
-			String zhi = "{\"action_name\": \"QR_LIMIT_STR_SCENE\",\"action_info\": {\"scene\": {\"scene_str\": \""+info+"\"}}}";
-			
-			JSONObject object = doPostStr(url, zhi);
-			String qrticket = (String) object.get("ticket");
-			System.out.println(qrticket);
-			return qrticket;
+	/**
+	 * 模板推送 自定义
+	 * @param moBan
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws DocumentException
+	 * @throws IOException
+	 */
+	public static String tuiSong(WeiXinMoBan moBan) throws ClientProtocolException, DocumentException, IOException {
+		WeixinGlobal global = WeiXinUtil.useGetGlobal();// 从xml中得到token和ticket
+		String token = global.getAccess_token();
+		String info = "{\"touser\":\"" + moBan.getTouser() + "\",\"template_id\":\"" + moBan.getTemplate_id()
+				+ "\",\"url\":\"" + moBan.getUrl() + "\",\"data\":" + moBan.getData() + "}";
+		String url = WxGlobal.sendMessage.replace("ACCESS_TOKEN", token);
+		JSONObject object = WeiXinUtil.doPostStr(url, info);
 
-		}
-		
+		return object.getString("errmsg");
 
-		/**
-		 * 文本消息转化为xml
-		 * 
-		 * @param textMessage
-		 * @return
-		 */
-		public static String textMessageToXml(Object textMessage) {
-			XStream xstream = new XStream();
-			xstream.alias("xml", textMessage.getClass());
-			return xstream.toXML(textMessage);
-
-		}
-		
-		/**
-		 * 将xml转化为Map集合
-		 * 
-		 * @param request
-		 * @return
-		 */
-		public static Map<String, String> xmlToMap(Document document) {
-			Map<String, String> map = new HashMap<String, String>();
-			Element rootElt = document.getRootElement();
-			List<Element> list = rootElt.elements();
-			for (Element e : list) {
-				map.put(e.getName(), e.getText());
-			}
-
-			return map;
-		}
-
-		
-
-		/**
-		 * @return
-		 * @throws DocumentException
-		 * @throws ClientProtocolException
-		 * @throws IOException
-		 * 得到微信全局信息
-		 */
-		public static WeixinGlobal useGetGlobal() throws DocumentException,
-				ClientProtocolException, IOException {
-			WeiXinUtil weiXinUtil = new WeiXinUtil();
-
-			return weiXinUtil.getGlobal();
-
-		}
-		
-		// 读取xml文件
-		public WeixinGlobal getGlobal() throws DocumentException,
-				ClientProtocolException, IOException {
-			ClassPathResource cpr = new ClassPathResource("static/xml/weixininfo.xml");
-			File file =cpr.getFile();
-			// 创建saxReader对象
-			SAXReader reader = new SAXReader();
-			
-			if (file.length() == 0) {
-				setWeixinInfo();
-			}
-			// 通过read方法读取一个文件 转换成Document对象
-			Document document = reader.read(file);
-			// 获取根节点元素对象
-			Element node = document.getRootElement();
-			// 获取access_token
-			Element element1 = node.element("access__token");
-			// 获取ticket
-			Element element2 = node.element("ticket");
-			// 获取存的时间
-			Element element3 = node.element("datetime");
-			WeixinGlobal global = new WeixinGlobal(element1.getText(),
-					element2.getText(), Long.parseLong(element3.getText()));
-
-			return global;
-
-		}
-		
-		/**
-		 * 动态的获取ACCESS_TOKEN和ticket并生成xml文件
-		 * 
-		 * @throws IOException
-		 * @throws ClientProtocolException
-		 */
-		public static void setWeixinInfo() throws ClientProtocolException,
-				IOException {
-
-			// 获取token
-			AccessToken token = getAccessToken();
-			JsapiTicket ticket = getJsapiTicket(token.getToken());
-			WeixinGlobal global = new WeixinGlobal();
-			global.setAccess_token(token.getToken());
-			global.setTicket(ticket.getTicket());
-			global.setDatetime(System.currentTimeMillis());
-			String xmlinfo = textMessageToXml(global);
-			System.out.println(xmlinfo);
-			useWriteXml(xmlinfo);
-
-		}
-		
-		/**
-		 * 写入文件
-		 * 
-		 * @param filename
-		 *            文件名称
-		 * @param info
-		 *            文件信息
-		 * @throws IOException
-		 */
-		public static void useWriteXml(String info) throws IOException {
-
-			WeiXinUtil xinUtil = new WeiXinUtil();
-			xinUtil.writeXml(info);
-
-		}
-		
-		/**
-		 * @param filename
-		 *            文件名称
-		 * @param info
-		 *            文件内容
-		 * @throws IOException
-		 */
-		public void writeXml(String info) throws IOException {
-
-			ClassPathResource cpr = new ClassPathResource("static/xml/weixininfo.xml");
-			File file =cpr.getFile();
-			FileWriter writer = new FileWriter(file);
-			writer.write(info);
-			writer.close();
-
-		}
-
-		/**
-		 * 获取用户信息
-		 * @param code
-		 * @return
-		 * @throws IOException 
-		 * @throws ClientProtocolException 
-		 */
-		public static WeiXinUserInfo getUserInfo(String code) throws ClientProtocolException, IOException{
-			Map<String, Object> map = WeiXinUtil.oauth2GetOpenid(code);
-			String openid = (String) map.get("Openid");
-			String AccessToken = (String) map.get("AccessToken");
-			// String Expires_in = (String) map.get("");
-			// 获取用户信息
-			String url = WxGlobal.wxuserinfo.replace("ACCESS_TOKEN", AccessToken)
-					.replace("OPENID", openid);
-			JSONObject object = WeiXinUtil.doGetStr(url);
-			WeiXinUserInfo rule = (WeiXinUserInfo) JSONObject.toBean(object,
-					WeiXinUserInfo.class);
-			// System.out.println(rule.toString());
-			return rule;
-		}
-		
-		//获取临时二维码参数用作扫码登录
-		public static String getErWeiMa(String code) throws ClientProtocolException, DocumentException, IOException{
-			WeixinGlobal global= WeiXinUtil.useGetGlobal();
-			String token = global.getAccess_token();
-			String url = WxGlobal.lsewm.replace("TOKEN", token);
-			
-			String shuju ="{\"expire_seconds\": 180,\"action_name\": \"QR_LIMIT_STR_SCENE\",\"action_info\": {\"scene\": {\"scene_str\":\""+code+"\"}}}";
-			
-			JSONObject object = doPostStr(url, shuju);
-			String uri = (String) object.get("url");
-			return uri;
-			
-		}
-		
-		//模板推送 自定义
-		public static String tuiSong(WeiXinMoBan moBan) throws ClientProtocolException, DocumentException, IOException{
-			WeixinGlobal global = WeiXinUtil.useGetGlobal();//从xml中得到token和ticket
-			String token=global.getAccess_token();
-			String info = "{\"touser\":\""+moBan.getTouser()+"\",\"template_id\":\""+moBan.getTemplate_id()+"\",\"url\":\""+moBan.getUrl()+"\",\"data\":"+moBan.getData()+"}";
-			String url = WxGlobal.sendMessage.replace("ACCESS_TOKEN",token);
-			JSONObject object = WeiXinUtil.doPostStr(url, info);
-			
-			return object.getString("errmsg");
-			
-		}
-
-
+	}
 
 }

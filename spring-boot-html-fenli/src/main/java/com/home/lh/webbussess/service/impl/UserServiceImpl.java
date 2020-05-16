@@ -3,10 +3,13 @@ package com.home.lh.webbussess.service.impl;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.home.lh.util.Global;
+import com.home.lh.util.JsonMap;
 import com.home.lh.util.LayuiPage;
 import com.home.lh.util.systemutil.DateUtils;
 import com.home.lh.util.systemutil.SimpleUtils;
@@ -46,11 +49,12 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String salt = DateUtils.backNum("");
-		if (user.getPassword() != null) {
+		if (user.getPassword() != null && !user.getPassword().equals("")) {
 			String pwd = SystemUtils.MD5(Global.type, user.getPassword(), salt, Global.iterations);
 			user.setPassword(pwd);
+			user.setSalt(salt);
 		}
-		user.setSalt(salt);
+		
 
 		return userMapper.update(user);
 	}
@@ -149,6 +153,20 @@ public class UserServiceImpl implements UserService {
 	public Integer wxUpdate(User user) {
 	
 		return userMapper.update(user);
+	}
+
+	@Override
+	public JsonMap loginOut() {
+		Integer result = -1;		
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			
+			subject.logout();
+			result=1;
+		} catch (Exception e) {			
+			e.printStackTrace();
+		}		
+		return SimpleUtils.addOruPdate(result, null, "退出成功");
 	}
 
 }

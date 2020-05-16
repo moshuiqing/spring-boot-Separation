@@ -1,7 +1,9 @@
 package com.home.lh.other.ftp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
 import com.baidu.ueditor.PathFormat;
 import com.home.lh.other.ftp.po.FilePath;
@@ -207,7 +210,7 @@ public class FtpUploadController {
 	
 	/**
 	 * @param request
-	 * @return 文件上传
+	 * @return 文件上传 android
 	 */
 	@RequestMapping(value = "upFile", method = RequestMethod.POST)
 	@ResponseBody
@@ -221,15 +224,15 @@ public class FtpUploadController {
 			br.setCode(-1);
 			return br;
 		}
-		Cache<String, Object> sysCache = ehCacheManager.getCache("menuEacache");
+		Cache<String, Object> sysCache = ehCacheManager.getCache(Global.FILEPATH);
 		String path;
 		try {
 			Integer index = Integer.parseInt(INDEXPATH);//Integer.parseInt(request.getParameter(Global.INDEXPATH));
 			FilePath filePath = (FilePath) sysCache.get(Global.FILEPATHKEY);
-			path = Global.context.getAttribute("ftpScource") + filePath.getWebFilePath()[index];
+			path = Global.context.getAttribute("ftpScource") + filePath.getMobileFilePath()[index];
 		} catch (NumberFormatException e) {
 			String filename = UUID.randomUUID().toString();
-			path = "/web/default/" + filename;
+			path = "/phone/default/" + filename;
 		}
 
 		try {
@@ -253,6 +256,68 @@ public class FtpUploadController {
 		}
 
 		return br;
+	}
+	
+	
+	/**
+	 * 批量上传 android
+	 * @param files
+	 * @param INDEXPATH
+	 * @return
+	 */
+	@RequestMapping(value = "batchUpload", method = RequestMethod.POST)
+	@ResponseBody
+	@ApiOperation(value = "批量文件上传android", notes = "批量文件上传android")
+	public JsonMap batchUpload(HttpServletRequest request,@RequestParam("index")String INDEXPATH) {
+		MultipartRequest multipartRequest = (MultipartRequest) request;
+		List<MultipartFile> files = multipartRequest.getFiles("file");
+		
+		List<String> urls = new ArrayList<String>();
+		
+		Ftp ftp = new Ftp();
+		boolean flag = ftp.ftpLogin();
+		JsonMap br = new JsonMap();
+		if (!flag) {
+			br.setMsg("ftp登录失败！");
+			br.setCode(-1);
+			return br;
+		}
+		Cache<String, Object> sysCache = ehCacheManager.getCache(Global.FILEPATH);
+		String path;
+		try {
+			Integer index = Integer.parseInt(INDEXPATH);//Integer.parseInt(request.getParameter(Global.INDEXPATH));
+			FilePath filePath = (FilePath) sysCache.get(Global.FILEPATHKEY);
+			path = Global.context.getAttribute("ftpScource") + filePath.getMobileFilePath()[index];
+		} catch (NumberFormatException e) {
+			String filename = UUID.randomUUID().toString();
+			path = "/web/default/" + filename;
+		}
+		
+		
+		try {
+			for(MultipartFile file:files) {
+					String name = file.getOriginalFilename();
+					String hz = name.substring(name.lastIndexOf("."), name.length());
+					String uploadPath = PathFormat.parse(path, name);
+					String filename = uploadPath.substring(uploadPath.lastIndexOf("/") + 1, uploadPath.length()) + hz;
+					String upPath = uploadPath.substring(0, uploadPath.lastIndexOf("/") + 1);
+					ftp.uploadFileToFtp(file.getInputStream(), filename, upPath);
+					urls.add(upPath+filename);
+			}
+			
+			br.setMsg("上传成功！");
+			br.setCode(1);
+			br.setObject(urls);		
+		} catch (IOException e) {
+			e.printStackTrace();
+			br.setCode(-1);
+			br.setMsg("上传失败");
+		}finally {
+			ftp.ftpLogOut();
+		}
+
+		return br;
+		
 	}
 	
 

@@ -13,11 +13,13 @@ import org.tio.websocket.common.WsResponse;
 import org.tio.websocket.common.WsSessionContext;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.home.lh.other.chat.util.ChatJsonMsg;
+import com.home.lh.other.chat.util.ChatJsonMsg.Send;
 import com.home.lh.system.po.SysUser;
 import com.home.lh.system.service.SysUserService;
 import com.home.lh.util.Global;
-import com.home.lh.util.systemutil.CloseImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +35,10 @@ public class ShowcaseWsMsgHandler implements IWsMsgHandler {
 			throws Exception {
 		String clientip = httpRequest.getClientIp();
 		String uid = httpRequest.getParam("id");// 用户id
+		if(uid==null) {
+			//app传来的消息
+			uid="android"+httpRequest.getHeader("id");
+		}
 		Tio.bindUser(channelContext, uid);
 		channelContext.setAttribute("id", uid);
 		log.info("收到来自{}的ws握手包\r\n{}", clientip, httpRequest.toString());
@@ -46,7 +52,7 @@ public class ShowcaseWsMsgHandler implements IWsMsgHandler {
 		// 绑定到群组，后面会有群发
 		String groups = httpRequest.getParam("groups");
 		if (groups != null) {
-			String[] groupIds = groups.split(",");
+			String[] groupIds = groups.split(","); 
 			for (int i = 0; i < groupIds.length; i++) {
 				Tio.bindGroup(channelContext, groupIds[i]);
 			}
@@ -56,7 +62,7 @@ public class ShowcaseWsMsgHandler implements IWsMsgHandler {
 
 	@Override
 	public Object onBytes(WsRequest wsRequest, byte[] bytes, ChannelContext channelContext) throws Exception {
-		//log.info("接收到bytes消息");
+		// log.info("接收到bytes消息");
 
 		return null;
 	}
@@ -64,7 +70,7 @@ public class ShowcaseWsMsgHandler implements IWsMsgHandler {
 	@Override
 	public Object onClose(WsRequest wsRequest, byte[] bytes, ChannelContext channelContext) throws Exception {
 		if (log.isInfoEnabled()) {
-			//log.info("onBeforeClose\r\n{}", channelContext);
+			// log.info("onBeforeClose\r\n{}", channelContext);
 		}
 
 		if (Global.close != null) {
@@ -95,104 +101,120 @@ public class ShowcaseWsMsgHandler implements IWsMsgHandler {
 
 	@Override
 	public Object onText(WsRequest wsRequest, String text, ChannelContext channelContext) throws Exception {
-	//	log.info("接收到文本消息：" + text);
-		WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
-		HttpRequest httpRequest = wsSessionContext.getHandshakeRequest();// 获取websocket握手包
+		// log.info("接收到文本消息：" + text);
+		// WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
+		// HttpRequest httpRequest = wsSessionContext.getHandshakeRequest();//
+		// 获取websocket握手包
 		if (log.isDebugEnabled()) {
-			//log.debug("握手包:{}", httpRequest);
+			// log.debug("握手包:{}", httpRequest);
 		}
-
 		//log.info("收到ws消息:{}", text);
 
 		if (Objects.equals("心跳内容", text)) {
 			return null;
 		}
-		//System.out.println(text);
+		// System.out.println(text);
 		String type = null;
 		String userid = null;
 
 		if (text != null && !text.equals("心跳内容") && !text.equals("hello 连上了哦")) {
-			JSONObject obj = JSONObject.parseObject(text);
-			WsResponse wsResponsen = null;
-			switch (obj.getString("type")) {
-			case "chat":
-				// 表示聊天
-				JSONObject send = (JSONObject) obj.get("send");
-				type = send.getString("type");
-				userid = send.getString("toid");
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+			JSONObject obj;
+			try {
+				obj = JSONObject.parseObject(text);
 
-				if (type != null && type.equals("friend")) {
-					// 指定发送
+				WsResponse wsResponsen = null;
+				switch (obj.getString("type")) {
+				case "chat":
+					// 表示聊天
+					JSONObject send = (JSONObject) obj.get("send");
+					type = send.getString("type");
+					userid = send.getString("toid");
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+
+					if (type != null && type.equals("friend")) {
+						// 指定发送
+						Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
+					} else if (type != null && type.equals("group")) {
+						Tio.sendToGroup(channelContext.tioConfig, userid, wsResponsen);
+					} else if (type.equals("kefu")) {
+						// 客服模式聊天
+						// 指定发送
+						Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
+					}
+
+					break;
+				case "apply":
+					type = obj.getString("usertype");
+					userid = obj.getString("toid");
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+					// 发送申请信息
+					if (type != null && type.equals("friend")) {
+						// 指定发送
+						Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
+					} else if (type != null && type.equals("group")) {
+						Tio.sendToGroup(channelContext.tioConfig, userid, wsResponsen);
+					}
+
+					break;
+				case "systemagree":
+					// 表示系统消息通知
+					JSONObject send1 = (JSONObject) obj.get("send");
+					type = send1.getString("type");
+					userid = obj.getString("toid");
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+
+					if (type != null && type.equals("friend")) {
+						// 指定发送
+						Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
+					}
+
+					break;
+				case "systemGroup":
+					// 给群里发送系统消息
+					String groupid = obj.getString("groupid");
+					Tio.bindGroup(channelContext, groupid);
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+
+					Tio.sendToGroup(channelContext.tioConfig, groupid, wsResponsen);
+
+					break;
+				case "delFriend":
+					// 删除好友通知
+					userid = obj.getString("toid");
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
 					Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
-				} else if (type != null && type.equals("group")) {
-					Tio.sendToGroup(channelContext.tioConfig, userid, wsResponsen);
-				} else if(type.equals("kefu")) {
-					//客服模式聊天
-					// 指定发送
-					Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
+					break;
+				case "systemGroupRefund":
+					// 接受群解散消息
+					groupid = obj.getString("groupid");
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+					Tio.sendToGroup(channelContext.tioConfig, groupid, wsResponsen);
+					break;
+				case "unbindGroup":
+					// 解除绑定
+					groupid = obj.getString("groupid");
+					Tio.unbindGroup(groupid, channelContext);
+					break;
+
+				case "systemAddGroupId":
+					// 新增群添加群id
+					Tio.bindGroup(channelContext, obj.getString("groupid"));
+					break;
+				case"appMsg":
+					//app消息通信
+					JSONObject object = (JSONObject) obj.get("send");
+					Send s= JSON.toJavaObject(object,Send.class);
+					userid = s.getToid();
+					wsResponsen = WsResponse.fromText(text, Global.CHARSET);
+					Tio.sendToUser(channelContext.tioConfig, "android"+userid, wsResponsen);
+					break;
+
 				}
-
-				break;
-			case "apply":
-				type = obj.getString("usertype");
-				userid = obj.getString("toid");
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
-				// 发送申请信息
-				if (type != null && type.equals("friend")) {
-					// 指定发送
-					Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
-				} else if (type != null && type.equals("group")) {
-					Tio.sendToGroup(channelContext.tioConfig, userid, wsResponsen);
-				}
-
-				break;
-			case "systemagree":
-				// 表示系统消息通知
-				JSONObject send1 = (JSONObject) obj.get("send");
-				type = send1.getString("type");
-				userid = obj.getString("toid");
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
-
-				if (type != null && type.equals("friend")) {
-					// 指定发送
-					Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
-				}
-
-				break;
-			case "systemGroup":
-				// 给群里发送系统消息
-				String groupid = obj.getString("groupid");
-				Tio.bindGroup(channelContext, groupid);
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
-
-				Tio.sendToGroup(channelContext.tioConfig, groupid, wsResponsen);
-
-				break;
-			case "delFriend":
-				// 删除好友通知
-				userid = obj.getString("toid");
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
-				Tio.sendToUser(channelContext.tioConfig, userid, wsResponsen);
-				break;
-			case "systemGroupRefund":
-				// 接受群解散消息
-				groupid = obj.getString("groupid");
-				wsResponsen = WsResponse.fromText(text, Global.CHARSET);
-				Tio.sendToGroup(channelContext.tioConfig, groupid, wsResponsen);
-				break;
-			case "unbindGroup":
-				// 解除绑定
-				groupid = obj.getString("groupid");
-				Tio.unbindGroup(groupid, channelContext);
-				break;
-
-			case "systemAddGroupId":
-				// 新增群添加群id
-				Tio.bindGroup(channelContext, obj.getString("groupid"));
-				break;
-
-			
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+				
 			}
 
 		}

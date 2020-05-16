@@ -2,6 +2,7 @@ package com.home.lh.webbussess.service;
 
 import java.util.List;
 
+import com.home.lh.util.JsonMap;
 import com.home.lh.util.LayuiPage;
 import com.home.lh.webbussess.po.User;
 
@@ -89,5 +90,11 @@ public interface UserService {
 	 * @param uids
 	 */
 	Integer deletesWebUsers(String[] uids);
+	
+	/**
+	 * 退出登录
+	 * @return
+	 */
+	JsonMap loginOut();
 
 }

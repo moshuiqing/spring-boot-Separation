@@ -42,6 +42,9 @@ public class BckLister implements ServletContextListener {
 	
 	@Value("${webDFPort}")
 	public Integer webDFPort;
+	
+	@Value("${fs}")
+	public String fs;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -61,6 +64,7 @@ public class BckLister implements ServletContextListener {
 		/////////////////////////////////
 		c.setAttribute("webDFIP", webDFIP);
 		c.setAttribute("webDFPort", webDFPort);
+		c.setAttribute("fs", fs);
 		
 
 	}

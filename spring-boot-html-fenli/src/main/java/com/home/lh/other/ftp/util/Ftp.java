@@ -78,7 +78,7 @@ public class Ftp {
 			// 设置传输协议
 			this.ftpClient.enterLocalPassiveMode();
 			this.ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-			//log.info("恭喜" + this.user + "成功登陆FTP服务器");
+			log.info("恭喜" + this.user + "成功登陆FTP服务器");
 			isLogin = true;
 		} catch (Exception e) {
 			e.printStackTrace();

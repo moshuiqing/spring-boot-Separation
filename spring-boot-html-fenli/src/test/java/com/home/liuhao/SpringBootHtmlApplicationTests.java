@@ -6,18 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.home.liuhao.system.service.SysUserService;
+import com.home.lh.other.chat.util.ChatJsonMsg;
+import com.home.lh.other.chat.util.ChatJsonMsg.Send;
+import com.home.lh.system.service.SysUserService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SpringBootHtmlApplicationTests {
 
-	@Autowired
-	private SysUserService sysUserService;
 
 	@Test
 	public void contextLoads() {
-
+			
+	
 		
 	}
 

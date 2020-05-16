@@ -1,4 +1,4 @@
-package com.home.lh.other.weixin.service;
+package com.home.lh.other.weixin.service.impl;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.home.lh.other.weixin.mapper.ReplyMsgMapper;
 import com.home.lh.other.weixin.po.ReplyMsg;
+import com.home.lh.other.weixin.service.ReplyMsgService;
 import com.home.lh.util.LayuiPage;
 import com.home.lh.util.systemutil.SimpleUtils;
 

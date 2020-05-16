@@ -84,6 +84,12 @@ public class WxGlobal {
 	 */
 	public static String SMHD;
 	
+	
+	/**
+	 * 获取全部模板
+	 */
+	public static String wxTemplates;
+	
 	@Value("${SMHD}")
 	public void setSMHD(String sMHD) {
 		SMHD = sMHD;
@@ -158,5 +164,13 @@ public class WxGlobal {
 	public void setTOKEN(String tOKEN) {
 		TOKEN = tOKEN;
 	}
+
+	@Value("${wxTemplates}")
+	public void setWxTemplates(String wxTemplates) {
+		WxGlobal.wxTemplates = wxTemplates;
+	}
+	
+	
+	
 
 }

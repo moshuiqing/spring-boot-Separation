@@ -38,7 +38,7 @@ public class User implements Serializable {
 	 * 头像
 	 */
 	@ApiModelProperty(value = "头像")
-	private String HeadImg;
+	private String headImg;
 
 	/**
 	 * 手机号
