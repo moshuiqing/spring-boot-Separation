@@ -5,10 +5,11 @@
 		"/web/video/{yyyy}{mm}{dd}/{time}{rand:6}"
 		],
 	"mobileFilePath":[
-		"/mobile/default/{yyyy}{mm}{dd}/{time}{rand:6}"
-		"/mobile/img/{yyyy}{mm}{dd}/{time}{rand:6}"
-		"/mobile/video/{yyyy}{mm}{dd}/{time}{rand:6}"
-		"/mobile/headImg/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"mobile/default/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"mobile/img/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"mobile/video/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"mobile/headImg/{yyyy}{mm}{dd}/{time}{rand:6}"
+		"mobile/appchat/{yyyy}{mm}{dd}/{time}{rand:6}"
 		
 		
 		]

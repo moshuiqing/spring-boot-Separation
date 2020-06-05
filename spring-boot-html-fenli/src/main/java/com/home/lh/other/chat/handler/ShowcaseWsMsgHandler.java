@@ -15,7 +15,6 @@ import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.home.lh.other.chat.util.ChatJsonMsg;
 import com.home.lh.other.chat.util.ChatJsonMsg.Send;
 import com.home.lh.system.po.SysUser;
 import com.home.lh.system.service.SysUserService;

@@ -33,8 +33,9 @@ public class QueueProducer {
 	 * message); }
 	 */
 
-	@Autowired
-	private JmsMessagingTemplate jmsMessagingTemplate;
+	  @Autowired
+	  private JmsMessagingTemplate jmsMessagingTemplate;
+	
 	int i = 0;
 	boolean flag = true;
 
@@ -54,9 +55,9 @@ public class QueueProducer {
 				i++;
 				MapMessage mapMessage = new ActiveMQMapMessage();
 				mapMessage.setString("info", i + ":抢购中");
-				//this.jmsMessagingTemplate.convertAndSend("liuhao.queue", mapMessage);
-				//log.info("发送请求");
-
+				/*this.jmsMessagingTemplate.convertAndSend("liuhao.queue", mapMessage);
+				log.info("发送请求");
+*/
 			}else {
 				
 			}
@@ -66,5 +67,10 @@ public class QueueProducer {
 			e.printStackTrace();
 		}
 	}
+	
+	///////////////////////////////////////////
+	 
+   
+
 
 }

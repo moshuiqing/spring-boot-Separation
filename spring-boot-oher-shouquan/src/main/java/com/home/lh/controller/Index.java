@@ -61,7 +61,13 @@ public class Index {
 		OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
 		try {
 			XmlUtil util = new XmlUtil();
-			AuthorizeInfo info = util.getGlobal();
+			AuthorizeInfo info = null;
+			try {
+				info = util.getGlobal();
+			} catch (Exception e) {
+				info=null;
+				//e.printStackTrace();
+			}
 			if (info == null) {
 				sehzhi(oAuthClient,code,util);
 			}

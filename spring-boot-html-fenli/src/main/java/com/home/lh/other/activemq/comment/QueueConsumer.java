@@ -3,6 +3,7 @@ package com.home.lh.other.activemq.comment;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -38,4 +39,8 @@ public class QueueConsumer {
 			e.printStackTrace();
 		}
     } 
+	
+	
+	
+	
 }

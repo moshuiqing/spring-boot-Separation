@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
 import com.baidu.ueditor.PathFormat;
+import com.home.lh.other.compression.util.Screenshots;
 import com.home.lh.other.ftp.po.FilePath;
 import com.home.lh.other.ftp.util.Ftp;
 import com.home.lh.util.Global;
@@ -321,7 +322,76 @@ public class FtpUploadController {
 	}
 	
 
+	/**
+	 * 批量上传
+	 * @param request  请求
+	 * @param file  文件
+	 * @param INDEXPATH  保存地址
+	 * @return
+	 */
+	@RequestMapping(value = "appChatVideo", method = RequestMethod.POST)
+	@ResponseBody
+	@ApiOperation(value = "android聊天上传视频取封面", notes = "android聊天上传视频取封面")
+	public JsonMap appChatVideo(HttpServletRequest request, @RequestParam("file") MultipartFile file,String INDEXPATH) {
+		Ftp ftp = new Ftp();
+		boolean flag = ftp.ftpLogin();
+		JsonMap br = new JsonMap();
+		if (!flag) {
+			br.setMsg("ftp登录失败！");
+			br.setCode(-1);
+			return br;
+		}
+		Cache<String, Object> sysCache = ehCacheManager.getCache(Global.FILEPATH);
+		String path;
+		try {
+			Integer index = Integer.parseInt(INDEXPATH);//Integer.parseInt(request.getParameter(Global.INDEXPATH));
+			FilePath filePath = (FilePath) sysCache.get(Global.FILEPATHKEY);
+			path = Global.context.getAttribute("ftpScource") + filePath.getMobileFilePath()[index];
+		} catch (NumberFormatException e) {
+			String filename = UUID.randomUUID().toString();
+			path = "/phone/default/" + filename;
+		}
 
+		try {
+			if (file != null) {
+				String name = file.getOriginalFilename();
+				String hz = name.substring(name.lastIndexOf("."), name.length());
+				if(!hz.equalsIgnoreCase(".mp4")) {					
+					br.setCode(-1);
+					br.setMsg("只支持mp4格式");
+					return br;
+				}
+				
+				String uploadPath = PathFormat.parse(path, name);
+				String filename = uploadPath.substring(uploadPath.lastIndexOf("/") + 1, uploadPath.length()) + hz;
+				String upPath = uploadPath.substring(0, uploadPath.lastIndexOf("/") + 1);
+				ftp.uploadFileToFtp(file.getInputStream(), filename, upPath);
+				String voideUrl=upPath+filename;
+				/////////////////////////////截图//////////////////////////
+				
+				if(hz.equalsIgnoreCase(".mp4")) {
+					String jdlj = Global.ftpPath + voideUrl;
+					String imgurl = voideUrl.substring(0, voideUrl.lastIndexOf("/") + 1);
+					imgurl = Screenshots.getThumbnai(jdlj, imgurl);
+					voideUrl=voideUrl+","+imgurl;
+				}
+			
+				
+				///////////////////////////////////////////
+				br.setMsg("上传成功！");
+				br.setCode(1);
+				br.setObject(voideUrl);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			br.setCode(-1);
+			br.setMsg("上传失败");
+		}finally {
+			ftp.ftpLogOut();
+		}
+
+		return br;
+	}
 	
 	
 	
