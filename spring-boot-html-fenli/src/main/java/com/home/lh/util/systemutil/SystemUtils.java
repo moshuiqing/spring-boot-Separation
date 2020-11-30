@@ -98,8 +98,20 @@ public class SystemUtils {
 	 * 
 	 */
 	public static boolean isAjax(HttpServletRequest request) {
-		return (request.getHeader("X-Requested-With") != null
-				&& "XMLHttpRequest".equals(request.getHeader("X-Requested-With").toString()));
+	    String accept = request.getHeader("accept");
+        if (accept != null && accept.indexOf("application/json") != -1)
+        {
+            return true;
+        }
+
+        String xRequestedWith = request.getHeader("X-Requested-With");
+        if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1)
+        {
+            return true;
+        }
+
+      
+        return false;
 	}
 	
 	/**

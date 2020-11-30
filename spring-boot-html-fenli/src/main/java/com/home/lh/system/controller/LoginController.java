@@ -66,6 +66,7 @@ public class LoginController {
 	@ApiOperation("通过用户名密码登录")
 	@ResponseBody
 	public JsonMap sysLogin(SysUser u, HttpServletRequest request) {
+		log.debug("登录");
 		///// 开发时使用，正式时不调用
 		if (lg.equals("1")) {
 			menuService.cacheMenuModule();

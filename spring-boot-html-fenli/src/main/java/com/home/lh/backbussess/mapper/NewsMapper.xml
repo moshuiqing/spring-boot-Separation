@@ -57,7 +57,9 @@
 		<if test="n.typeid!=null and n.typeid!=''">
 			and typeid=#{n.typeid}
 		</if>
-		<if test="n.title!=null and n.title!=null">and n.title like '%${n.title}%'</if>
+		<if test="n.">
+		</if>
+		<if test="n.title!=null and n.title!=null">and n.title like concat('%',#{n.title},'%')</if>
 		order by n.createTime desc
 		limit #{one},#{two}
 	</select>

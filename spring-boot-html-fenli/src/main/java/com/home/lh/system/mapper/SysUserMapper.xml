@@ -30,7 +30,7 @@
 			<result property="birthday" column="birthday"/>
 		</association>
 		<association property="role" javaType="com.home.lh.system.po.Role">
-		<id property="id" column="id1" />
+			<id property="id" column="id1" />
 			<result property="name" column="name" />
 			<result property="modelid" column="modelid" />
 			<result property="remark" column="remark" />

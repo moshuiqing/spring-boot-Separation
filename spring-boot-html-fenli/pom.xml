@@ -34,6 +34,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<!-- 移除嵌入式tomcat插件 -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
@@ -61,11 +69,7 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 		<!-- JSON工具 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
@@ -314,8 +318,30 @@
 		</dependency>
 		<!--sentinel end -->
 
-	
+		<!-- 支付宝sdk -->
+		<!-- <dependency> <groupId>com.alipay.sdk</groupId> <artifactId>alipay-easysdk</artifactId> 
+			<version>1.2.1</version> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>4.10.0.ALL</version>
+		</dependency>
 
+
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 
 
@@ -323,12 +349,29 @@
 	</dependencies>
 
 	<build>
+		<finalName>lh</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<!-- 是否替换资源中的属性 -->
+				<filtering>false</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+
 			</plugin>
+
 		</plugins>
+
 	</build>
 
 </project>

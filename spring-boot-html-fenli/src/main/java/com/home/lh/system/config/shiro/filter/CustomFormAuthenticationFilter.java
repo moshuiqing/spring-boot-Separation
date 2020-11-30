@@ -1,7 +1,13 @@
 package com.home.lh.system.config.shiro.filter;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -17,49 +23,60 @@ import org.apache.shiro.web.util.WebUtils;
 import com.home.lh.system.config.shiro.UserToken;
 import com.home.lh.system.po.SysUser;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 扩展FormAuthenticationFilter实现动态改变LoginUrl
  */
+@Slf4j
 public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
 	/**
 	 * 重写登录地址
 	 */
-	/* (non-Javadoc)
-	 * @see org.apache.shiro.web.filter.AccessControlFilter#redirectToLogin(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.shiro.web.filter.AccessControlFilter#redirectToLogin(javax.servlet
+	 * .ServletRequest, javax.servlet.ServletResponse)
 	 */
 	@Override
 	protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse rep = (HttpServletResponse) response;
+		String method = req.getMethod();
+		log.debug("请求方式:" + method);
 		boolean flag = true;
 		Cookie[] cookie = req.getCookies();
-		if(cookie!=null) {
+		if (cookie != null) {
 			for (Cookie c : cookie) {
 				if (c.getName().equals("rememberMe") && c.getValue() != null && !c.getValue().equals("")) {
 					flag = false;
 				}
-			}	
-		}		
-		String url = req.getRequestURI();//请求链接
+			}
+		}
+		String url = req.getRequestURI();// 请求链接
+		log.debug("请求地址:" + url);
 		if (flag) {
 			if (url.contains("backsystem")) {
-				url = "/backsystem/sysuser/tologin"; //未登录进入登录页
+				url = "/backsystem/sysuser/tologin"; // 未登录进入登录页
 			} else if (url.contains("webbussess")) {
-				url = "/webbussess/weblogin/toWebLogin"; //客户登录页
+				url = "/webbussess/weblogin/toWebLogin"; // 客户登录页
 			} else if (url.contains("appdesk")) {
-				url = "/appdesk/appUser/backPrompt";  //app端返回未登陆通知
+				url = "/appdesk/appUser/backPrompt"; // app端返回未登陆通知
 			}
-			 String origin = req.getHeader("Origin");
-			  if(origin == null) {
-			   origin = req.getHeader("Referer");
-			  }
+			String origin = req.getHeader("Origin");
+			if (origin == null) {
+				origin = req.getHeader("Referer");
+			}
 			rep.setHeader("Access-Control-Allow-Origin", origin);
-			rep.setHeader("Access-Control-Allow-Credentials", "true");//true代表允许携带cookie
-			WebUtils.issueRedirect(req, rep, url); 
-		}else {
-			//登陆实现 将rememberMe中的用户信息取出来 不能直接赋值给user,原因我也不知道，可能序列化后产生的，因为密码存的是加密的，所以要自定义一个字段存非加密的密码
-			Subject subject = SecurityUtils.getSubject();  
-			if(subject.isRemembered()==true) {
+			rep.setHeader("Access-Control-Allow-Credentials", "true");// true代表允许携带cookie
+			WebUtils.issueRedirect(req, rep, url);
+		} else {
+			// 登陆实现 将rememberMe中的用户信息取出来
+			// 不能直接赋值给user,原因我也不知道，可能序列化后产生的，因为密码存的是加密的，所以要自定义一个字段存非加密的密码
+			Subject subject = SecurityUtils.getSubject();
+			if (subject.isRemembered() == true) {
 				Object key = subject.getPrincipal();
 				SysUser user = new SysUser();
 				try {
@@ -67,10 +84,24 @@ public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
 				} catch (Exception e) {
 					System.out.println("转换失败！");
 				}
-				UserToken token = new UserToken(user.getUserName(),user.getStrmsg(), user.getLoginType(), subject.isRemembered());
+				UserToken token = new UserToken(user.getUserName(), user.getStrmsg(), user.getLoginType(),
+						subject.isRemembered());
 				subject.login(token);
-				WebUtils.issueRedirect(request, response, url.substring(url.indexOf("/",1), url.length()));
+				String myurl = url.substring(url.indexOf("/", 1), url.length());
+				/*Map<String, String> map = new HashMap<String, String>();
+				map.put("url",myurl);
+				WebUtils.issueRedirect(req, rep, "/appdesk/appMain/zjz",map);*/
+				   RequestDispatcher requestDispatcher = request.getRequestDispatcher(myurl);
+			       try {
+					requestDispatcher.forward(request, response);
+				} catch (ServletException e) {
+				
+					e.printStackTrace();
+				}
+				//WebUtils.issueRedirect(req, rep, myurl);
+
 			}
+
 		}
 	}
 }

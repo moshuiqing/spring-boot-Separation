@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(value = "News", description = "新闻实体")
-@Document(indexName = "News")
+@Document(indexName = "news")
 public class News {
 
 	/**

@@ -11,7 +11,10 @@ import com.home.lh.other.weixin.service.ReplyMsgService;
 import com.home.lh.util.LayuiPage;
 import com.home.lh.util.systemutil.SimpleUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class ReplyMsgServiceImpl implements ReplyMsgService {
 
 	@Autowired
@@ -46,7 +49,8 @@ public class ReplyMsgServiceImpl implements ReplyMsgService {
 
 	@Override
 	public List<ReplyMsg> simpleFound(ReplyMsg msg) {
-
+		log.debug("执行消息");
+		log.debug("执行"+msgMapper);
 		return msgMapper.simpleFound(msg);
 	}
 

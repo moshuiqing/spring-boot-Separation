@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  *  自定义初始化加载  （在所有配置类加载完成之后加载）
  */
 @Component
-@Order(2)
+@Order(3)
 @Slf4j
 public class CacheMenuModule implements CommandLineRunner {
 	

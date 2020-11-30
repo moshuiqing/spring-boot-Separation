@@ -6,10 +6,15 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.home.lh.util.Global;
 
-@WebListener
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+//@WebListener
+@Component
 public class BckLister implements ServletContextListener {
 
 	@Value(value = "${webip}")
@@ -66,7 +71,7 @@ public class BckLister implements ServletContextListener {
 		c.setAttribute("webDFPort", webDFPort);
 		c.setAttribute("fs", fs);
 		
-
+		log.debug("上下文："+webip+"******"+webname);
 	}
 
 	/*

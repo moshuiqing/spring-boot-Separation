@@ -109,7 +109,7 @@ public class MainController {
 	@RequestMapping(value = "toMain", method = RequestMethod.GET)
 	@ApiOperation("进入首页")
 	public String toMain(Model m) {
-
+		log.debug("进入首页");
 		// 1.获取subject
 		Subject subject = SecurityUtils.getSubject();
 		Object key = subject.getPrincipal();
@@ -146,6 +146,7 @@ public class MainController {
 			headimg = null;
 		}
 		m.addAttribute("headimg", headimg);
+		log.debug("进入首页2222222222");
 		return "/liuhao/index";
 	}
 

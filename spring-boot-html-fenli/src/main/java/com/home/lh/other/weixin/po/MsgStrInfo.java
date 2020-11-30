@@ -1,5 +1,7 @@
 package com.home.lh.other.weixin.po;
 
+import java.util.Date;
+
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import io.swagger.annotations.ApiModel;
@@ -23,5 +25,8 @@ public class MsgStrInfo {
 	
 	@ApiModelProperty("答案")
 	private String answer;
+	
+	@ApiModelProperty("创建时间")
+	private Date createTime;
 
 }
