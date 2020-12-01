@@ -10,8 +10,6 @@
 		"mobile/video/{yyyy}{mm}{dd}/{time}{rand:6}"
 		"mobile/headImg/{yyyy}{mm}{dd}/{time}{rand:6}"
 		"mobile/appchat/{yyyy}{mm}{dd}/{time}{rand:6}"
-		
-		
 		]
 
 }

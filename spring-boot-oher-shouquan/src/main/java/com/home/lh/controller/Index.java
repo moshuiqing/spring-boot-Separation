@@ -61,6 +61,7 @@ public class Index {
 		OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
 		try {
 			XmlUtil util = new XmlUtil();
+<<<<<<< HEAD
 			AuthorizeInfo info = null;
 			try {
 				info = util.getGlobal();
@@ -68,6 +69,9 @@ public class Index {
 				info=null;
 				//e.printStackTrace();
 			}
+=======
+			AuthorizeInfo info = util.getGlobal();
+>>>>>>> branch 'master' of https://github.com/moshuiqing/spring-boot-Separation.git
 			if (info == null) {
 				sehzhi(oAuthClient,code,util);
 			}

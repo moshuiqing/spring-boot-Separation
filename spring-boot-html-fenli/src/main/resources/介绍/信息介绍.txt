@@ -10,4 +10,3 @@ oauth第三方授权
 
 微信game排名地址
 https://www.msqlh.com:11443/lh/wx/game
-
