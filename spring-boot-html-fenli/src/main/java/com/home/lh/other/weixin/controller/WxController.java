@@ -265,5 +265,12 @@ public class WxController {
 	}
 
 	
+	public JsonMap backUrl() {
+		
+		
+		
+		return null;
+	}
+	
 
 }
